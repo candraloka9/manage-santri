@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tambahkan library untuk export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -67,6 +70,18 @@
             opacity: 0.6;
             pointer-events: none;
         }
+        /* Style untuk modal edit */
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Style untuk tombol export */
+        .export-btn {
+            transition: all 0.2s ease;
+        }
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -106,7 +121,7 @@
                     <i class="fas fa-mosque text-2xl"></i>
                     <div>
                         <h1 class="text-xl font-bold">Dashboard Santri</h1>
-                        <p class="text-sm text-blue-200">Pondok Pesantren Al-Ikhlas</p>
+                        <p class="text-sm text-blue-200">Pondok Pesantren Al-Maa</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -231,9 +246,17 @@
             <section id="data-santri" class="content-section hidden fade-in">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Data Santri</h2>
-                    <button id="tambah-santri-btn" class="bg-primary hover:bg-santri text-white px-4 py-2 rounded-lg flex items-center shadow">
-                        <i class="fas fa-plus mr-2"></i> Tambah Santri
-                    </button>
+                    <div class="flex space-x-2">
+                        <button id="export-santri-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-santri-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                        <button id="tambah-santri-btn" class="bg-primary hover:bg-santri text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-plus mr-2"></i> Tambah Santri
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Form Tambah Santri -->
@@ -299,7 +322,17 @@
 
             <!-- Absen Kesantrian Section -->
             <section id="absen" class="content-section hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Absensi Santri</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Absensi Santri</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-absen-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-absen-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Form Absen -->
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -351,11 +384,12 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Santri</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="absen-table-body" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                         <i class="fas fa-spinner fa-spin"></i> Memuat data absensi...
                                     </td>
                                 </tr>
@@ -367,7 +401,17 @@
 
             <!-- Setoran Hafalan Section -->
             <section id="hafalan" class="content-section hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Setoran Hafalan</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Setoran Hafalan</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-hafalan-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-hafalan-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Form Setoran Hafalan -->
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -420,11 +464,12 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Santri</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Halaman</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="hafalan-table-body" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                         <i class="fas fa-spinner fa-spin"></i> Memuat data hafalan...
                                     </td>
                                 </tr>
@@ -436,7 +481,17 @@
 
             <!-- Kesantrian Section -->
             <section id="kesantrian" class="content-section hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Penilaian Kesantrian</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Penilaian Kesantrian</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-kesantrian-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-kesantrian-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Form Penilaian Kesantrian -->
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -511,11 +566,12 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disiplin</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kebersihan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="kesantrian-table-body" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                                         <i class="fas fa-spinner fa-spin"></i> Memuat data kesantrian...
                                     </td>
                                 </tr>
@@ -527,7 +583,17 @@
 
             <!-- Kasus & Penanganan Section -->
             <section id="kasus" class="content-section hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Kasus & Penanganan</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Kasus & Penanganan</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-kasus-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-kasus-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Form Kasus -->
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -581,11 +647,12 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kasus</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Penanganan</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poin</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="kasus-table-body" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                         <i class="fas fa-spinner fa-spin"></i> Memuat data kasus...
                                     </td>
                                 </tr>
@@ -597,7 +664,17 @@
 
             <!-- Sanksi & Pelanggaran Section -->
             <section id="sanksi" class="content-section hidden fade-in">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Sanksi & Pelanggaran</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Sanksi & Pelanggaran</h2>
+                    <div class="flex space-x-2">
+                        <button id="export-pelanggaran-pdf" class="export-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                        </button>
+                        <button id="export-pelanggaran-excel" class="export-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center shadow">
+                            <i class="fas fa-file-excel mr-2"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Form Input Pelanggaran -->
                 <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -662,11 +739,12 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggaran</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pengurangan Point</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sanksi Fisik</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="pelanggaran-table-body" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                         <i class="fas fa-spinner fa-spin"></i> Memuat data pelanggaran...
                                     </td>
                                 </tr>
@@ -796,9 +874,295 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal Edit Santri -->
+        <div id="modal-edit-santri" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Santri</h3>
+                        <button id="close-edit-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-santri-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-santri-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Santri</label>
+                            <input type="text" id="edit-nama-santri" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                            <input type="text" id="edit-kelas-santri" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Asal</label>
+                            <input type="text" id="edit-asal-santri" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Umur</label>
+                            <input type="number" id="edit-umur-santri" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Masuk</label>
+                            <input type="date" id="edit-tanggal-masuk" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Wali</label>
+                            <input type="text" id="edit-nama-wali" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Poin Kesantrian</label>
+                            <input type="number" id="edit-poin-santri" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" min="0" max="100" required>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Absensi -->
+        <div id="modal-edit-absensi" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Absensi</h3>
+                        <button id="close-edit-absensi-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-absensi-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-absensi-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="edit-tanggal-absensi" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="edit-status-absensi" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="hadir">Hadir</option>
+                                <option value="sakit">Sakit</option>
+                                <option value="ijin">Ijin</option>
+                                <option value="pulang">Pulang</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+                            <input type="text" id="edit-keterangan-absensi" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Opsional">
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit-absensi" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Hafalan -->
+        <div id="modal-edit-hafalan" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Hafalan</h3>
+                        <button id="close-edit-hafalan-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-hafalan-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-hafalan-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="edit-tanggal-hafalan" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Halaman Awal</label>
+                            <input type="number" id="edit-halaman-awal" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Halaman Akhir</label>
+                            <input type="number" id="edit-halaman-akhir" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                            <textarea id="edit-catatan-hafalan" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Catatan tentang hafalan santri"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit-hafalan" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Kesantrian -->
+        <div id="modal-edit-kesantrian" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Kesantrian</h3>
+                        <button id="close-edit-kesantrian-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-kesantrian-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-kesantrian-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="edit-tanggal-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sikap</label>
+                            <select id="edit-sikap-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="baik">Baik</option>
+                                <option value="cukup">Cukup</option>
+                                <option value="kurang">Kurang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Disiplin</label>
+                            <select id="edit-disiplin-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="baik">Baik</option>
+                                <option value="cukup">Cukup</option>
+                                <option value="kurang">Kurang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kebersihan & Kerapihan</label>
+                            <select id="edit-kebersihan-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="baik">Baik</option>
+                                <option value="cukup">Cukup</option>
+                                <option value="kurang">Kurang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pelanggaran (opsional)</label>
+                            <input type="text" id="edit-pelanggaran-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Jenis pelanggaran jika ada">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                            <textarea id="edit-catatan-kesantrian" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" placeholder="Catatan tambahan tentang kesantrian"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit-kesantrian" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Kasus -->
+        <div id="modal-edit-kasus" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Kasus</h3>
+                        <button id="close-edit-kasus-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-kasus-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-kasus-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="edit-tanggal-kasus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Poin yang Dikurangi</label>
+                            <input type="number" id="edit-poin-kasus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" min="0" max="100" value="0">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Kasus</label>
+                            <textarea id="edit-deskripsi-kasus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" required placeholder="Deskripsi kasus yang terjadi"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Penanganan</label>
+                            <textarea id="edit-penanganan-kasus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" required placeholder="Tindakan penanganan yang dilakukan"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit-kasus" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Pelanggaran -->
+        <div id="modal-edit-pelanggaran" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-1/2 max-h-screen overflow-y-auto modal-content">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Edit Data Pelanggaran</h3>
+                        <button id="close-edit-pelanggaran-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="edit-pelanggaran-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="hidden" id="edit-pelanggaran-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="edit-tanggal-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Pelanggaran</label>
+                            <select id="edit-jenis-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="">Pilih jenis pelanggaran...</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Pelanggaran</label>
+                            <textarea id="edit-deskripsi-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" required placeholder="Deskripsi detail pelanggaran yang dilakukan"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sanksi Fisik yang Diberikan</label>
+                            <textarea id="edit-sanksi-fisik" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Sanksi fisik yang telah diberikan"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end space-x-2 mt-2">
+                            <button type="button" id="batal-edit-pelanggaran" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Konfirmasi Hapus Modal -->
+        <div id="modal-hapus" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-1/2 max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Konfirmasi Hapus</h3>
+                        <button id="close-hapus-modal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-gray-700">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2">
+                        <button id="batal-hapus" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">Batal</button>
+                        <button id="konfirmasi-hapus" class="px-4 py-2 bg-danger text-white rounded-md hover:bg-red-600">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script>
+        <script>
         // Inisialisasi Supabase
         const SUPABASE_URL = 'https://pwkajpjrtheglmkgfige.supabase.co'; // Ganti dengan URL Supabase Anda
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3a2FqcGpydGhlZ2xta2dmaWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNTA2NDUsImV4cCI6MjA3ODcyNjY0NX0.I8vvCewUPrRbBs86AiJ46CWxOKf3T21msbQCETYmmI4'; // Ganti dengan anon key Anda
@@ -814,6 +1178,8 @@
         let kasusData = [];
         let pelanggaranData = [];
         let jenisPelanggaranData = [];
+        let currentEditId = null;
+        let currentEditType = null;
 
         // DOM Elements
         const loginSection = document.getElementById('login-section');
@@ -841,6 +1207,20 @@
         const santriForm = document.getElementById('santri-form');
         const batalTambah = document.getElementById('batal-tambah');
         const santriTableBody = document.getElementById('santri-table-body');
+        
+        // Export Elements
+        const exportSantriPdfBtn = document.getElementById('export-santri-pdf');
+        const exportSantriExcelBtn = document.getElementById('export-santri-excel');
+        const exportAbsenPdfBtn = document.getElementById('export-absen-pdf');
+        const exportAbsenExcelBtn = document.getElementById('export-absen-excel');
+        const exportHafalanPdfBtn = document.getElementById('export-hafalan-pdf');
+        const exportHafalanExcelBtn = document.getElementById('export-hafalan-excel');
+        const exportKesantrianPdfBtn = document.getElementById('export-kesantrian-pdf');
+        const exportKesantrianExcelBtn = document.getElementById('export-kesantrian-excel');
+        const exportKasusPdfBtn = document.getElementById('export-kasus-pdf');
+        const exportKasusExcelBtn = document.getElementById('export-kasus-excel');
+        const exportPelanggaranPdfBtn = document.getElementById('export-pelanggaran-pdf');
+        const exportPelanggaranExcelBtn = document.getElementById('export-pelanggaran-excel');
         
         // Absensi Elements
         const absenForm = document.getElementById('absen-form');
@@ -899,6 +1279,43 @@
         const modalHafalan = document.getElementById('modal-hafalan');
         const modalKesantrian = document.getElementById('modal-kesantrian');
         const modalKasus = document.getElementById('modal-kasus');
+        
+        // Edit Modal Elements
+        const modalEditSantri = document.getElementById('modal-edit-santri');
+        const closeEditModal = document.getElementById('close-edit-modal');
+        const editSantriForm = document.getElementById('edit-santri-form');
+        const batalEdit = document.getElementById('batal-edit');
+        
+        const modalEditAbsensi = document.getElementById('modal-edit-absensi');
+        const closeEditAbsensiModal = document.getElementById('close-edit-absensi-modal');
+        const editAbsensiForm = document.getElementById('edit-absensi-form');
+        const batalEditAbsensi = document.getElementById('batal-edit-absensi');
+        
+        const modalEditHafalan = document.getElementById('modal-edit-hafalan');
+        const closeEditHafalanModal = document.getElementById('close-edit-hafalan-modal');
+        const editHafalanForm = document.getElementById('edit-hafalan-form');
+        const batalEditHafalan = document.getElementById('batal-edit-hafalan');
+        
+        const modalEditKesantrian = document.getElementById('modal-edit-kesantrian');
+        const closeEditKesantrianModal = document.getElementById('close-edit-kesantrian-modal');
+        const editKesantrianForm = document.getElementById('edit-kesantrian-form');
+        const batalEditKesantrian = document.getElementById('batal-edit-kesantrian');
+        
+        const modalEditKasus = document.getElementById('modal-edit-kasus');
+        const closeEditKasusModal = document.getElementById('close-edit-kasus-modal');
+        const editKasusForm = document.getElementById('edit-kasus-form');
+        const batalEditKasus = document.getElementById('batal-edit-kasus');
+        
+        const modalEditPelanggaran = document.getElementById('modal-edit-pelanggaran');
+        const closeEditPelanggaranModal = document.getElementById('close-edit-pelanggaran-modal');
+        const editPelanggaranForm = document.getElementById('edit-pelanggaran-form');
+        const batalEditPelanggaran = document.getElementById('batal-edit-pelanggaran');
+        
+        // Hapus Modal Elements
+        const modalHapus = document.getElementById('modal-hapus');
+        const closeHapusModal = document.getElementById('close-hapus-modal');
+        const batalHapus = document.getElementById('batal-hapus');
+        const konfirmasiHapus = document.getElementById('konfirmasi-hapus');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -994,6 +1411,9 @@
                     loadPelanggaranData(),
                     loadJenisPelanggaran()
                 ]);
+                
+                // Sinkronisasi poin
+                await updateAllSantriPoints();
                 
                 updateSantriDropdowns();
                 loadDashboardData();
@@ -1103,6 +1523,26 @@
             return data[0];
         }
 
+        async function updateSantri(id, santriData) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .update(santriData)
+                .eq('id', id)
+                .select();
+            
+            if (error) throw error;
+            return data[0];
+        }
+
+        async function deleteSantri(id) {
+            const { error } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
+        }
+
         async function createAbsensi(absensiData) {
             const { data, error } = await supabase
                 .from('absensi')
@@ -1111,6 +1551,26 @@
             
             if (error) throw error;
             return data[0];
+        }
+
+        async function updateAbsensi(id, absensiData) {
+            const { data, error } = await supabase
+                .from('absensi')
+                .update(absensiData)
+                .eq('id', id)
+                .select();
+            
+            if (error) throw error;
+            return data[0];
+        }
+
+        async function deleteAbsensi(id) {
+            const { error } = await supabase
+                .from('absensi')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
         }
 
         async function createHafalan(hafalanData) {
@@ -1123,6 +1583,26 @@
             return data[0];
         }
 
+        async function updateHafalan(id, hafalanData) {
+            const { data, error } = await supabase
+                .from('hafalan')
+                .update(hafalanData)
+                .eq('id', id)
+                .select();
+            
+            if (error) throw error;
+            return data[0];
+        }
+
+        async function deleteHafalan(id) {
+            const { error } = await supabase
+                .from('hafalan')
+                .delete()
+                .eq('id', id);
+            
+            if (error) throw error;
+        }
+
         async function createKesantrian(kesantrianData) {
             const { data, error } = await supabase
                 .from('kesantrian')
@@ -1131,6 +1611,77 @@
             
             if (error) throw error;
             return data[0];
+        }
+
+        async function updateKesantrian(id, kesantrianData) {
+            try {
+                // Ambil data lama untuk menghitung perbedaan poin
+                const { data: oldData } = await supabase
+                    .from('kesantrian')
+                    .select('pengurangan_poin, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Update data kesantrian
+                const { data, error } = await supabase
+                    .from('kesantrian')
+                    .update(kesantrianData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                // Update poin santri jika ada perubahan pengurangan poin
+                if (oldData && kesantrianData.pengurangan_poin !== undefined) {
+                    const selisihPoin = kesantrianData.pengurangan_poin - oldData.pengurangan_poin;
+                    const santri = santriData.find(s => s.id === oldData.santri_id);
+                    
+                    if (santri) {
+                        const newPoin = Math.max(0, santri.poin_kesantrian - selisihPoin);
+                        await supabase
+                            .from('profiles')
+                            .update({ poin_kesantrian: newPoin })
+                            .eq('id', oldData.santri_id);
+                    }
+                }
+                
+                return data[0];
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function deleteKesantrian(id) {
+            try {
+                // Ambil data sebelum hapus
+                const { data: kesantrian } = await supabase
+                    .from('kesantrian')
+                    .select('pengurangan_poin, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Hapus data
+                const { error } = await supabase
+                    .from('kesantrian')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                // Kembalikan poin santri
+                if (kesantrian) {
+                    const santri = santriData.find(s => s.id === kesantrian.santri_id);
+                    if (santri) {
+                        const newPoin = Math.min(100, santri.poin_kesantrian + kesantrian.pengurangan_poin);
+                        await supabase
+                            .from('profiles')
+                            .update({ poin_kesantrian: newPoin })
+                            .eq('id', kesantrian.santri_id);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
         }
 
         async function createKasus(kasusData) {
@@ -1143,6 +1694,77 @@
             return data[0];
         }
 
+        async function updateKasus(id, kasusData) {
+            try {
+                // Ambil data lama
+                const { data: oldData } = await supabase
+                    .from('kasus')
+                    .select('pengurangan_poin, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Update data kasus
+                const { data, error } = await supabase
+                    .from('kasus')
+                    .update(kasusData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                // Update poin santri jika ada perubahan
+                if (oldData && kasusData.pengurangan_poin !== undefined) {
+                    const selisihPoin = kasusData.pengurangan_poin - oldData.pengurangan_poin;
+                    const santri = santriData.find(s => s.id === oldData.santri_id);
+                    
+                    if (santri) {
+                        const newPoin = Math.max(0, santri.poin_kesantrian - selisihPoin);
+                        await supabase
+                            .from('profiles')
+                            .update({ poin_kesantrian: newPoin })
+                            .eq('id', oldData.santri_id);
+                    }
+                }
+                
+                return data[0];
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function deleteKasus(id) {
+            try {
+                // Ambil data sebelum hapus
+                const { data: kasus } = await supabase
+                    .from('kasus')
+                    .select('pengurangan_poin, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Hapus data
+                const { error } = await supabase
+                    .from('kasus')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                // Kembalikan poin santri
+                if (kasus) {
+                    const santri = santriData.find(s => s.id === kasus.santri_id);
+                    if (santri) {
+                        const newPoin = Math.min(100, santri.poin_kesantrian + kasus.pengurangan_poin);
+                        await supabase
+                            .from('profiles')
+                            .update({ poin_kesantrian: newPoin })
+                            .eq('id', kasus.santri_id);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
         async function createPelanggaran(pelanggaranData) {
             const { data, error } = await supabase
                 .from('pelanggaran')
@@ -1151,6 +1773,84 @@
             
             if (error) throw error;
             return data[0];
+        }
+
+        async function updatePelanggaran(id, pelanggaranData) {
+            try {
+                // Ambil data lama
+                const { data: oldData } = await supabase
+                    .from('pelanggaran')
+                    .select('jenis_pelanggaran_id, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Update data pelanggaran
+                const { data, error } = await supabase
+                    .from('pelanggaran')
+                    .update(pelanggaranData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                // Update poin santri jika jenis pelanggaran berubah
+                if (oldData && pelanggaranData.jenis_pelanggaran_id !== undefined) {
+                    const oldJenis = jenisPelanggaranData.find(j => j.id === oldData.jenis_pelanggaran_id);
+                    const newJenis = jenisPelanggaranData.find(j => j.id === pelanggaranData.jenis_pelanggaran_id);
+                    
+                    if (oldJenis && newJenis) {
+                        const selisihPoin = newJenis.pengurangan_point - oldJenis.pengurangan_point;
+                        const santri = santriData.find(s => s.id === oldData.santri_id);
+                        
+                        if (santri) {
+                            const newPoin = Math.max(0, santri.poin_kesantrian - selisihPoin);
+                            await supabase
+                                .from('profiles')
+                                .update({ poin_kesantrian: newPoin })
+                                .eq('id', oldData.santri_id);
+                        }
+                    }
+                }
+                
+                return data[0];
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function deletePelanggaran(id) {
+            try {
+                // Ambil data sebelum hapus
+                const { data: pelanggaran } = await supabase
+                    .from('pelanggaran')
+                    .select('jenis_pelanggaran_id, santri_id')
+                    .eq('id', id)
+                    .single();
+                
+                // Hapus data
+                const { error } = await supabase
+                    .from('pelanggaran')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                // Kembalikan poin santri
+                if (pelanggaran) {
+                    const jenis = jenisPelanggaranData.find(j => j.id === pelanggaran.jenis_pelanggaran_id);
+                    const santri = santriData.find(s => s.id === pelanggaran.santri_id);
+                    
+                    if (jenis && santri) {
+                        const newPoin = Math.min(100, santri.poin_kesantrian + jenis.pengurangan_point);
+                        await supabase
+                            .from('profiles')
+                            .update({ poin_kesantrian: newPoin })
+                            .eq('id', pelanggaran.santri_id);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
         }
 
         // Update poin santri setelah pelanggaran
@@ -1167,6 +1867,66 @@
                 return newPoints;
             }
             return santri.poin_kesantrian;
+        }
+
+        // Fungsi update semua poin santri
+        async function updateAllSantriPoints() {
+            try {
+                // Ambil semua santri
+                const { data: santris, error } = await supabase
+                    .from('profiles')
+                    .select('*');
+                
+                if (error) throw error;
+                
+                // Update poin untuk setiap santri
+                for (const santri of santris) {
+                    let totalPengurangan = 0;
+                    
+                    // Hitung pengurangan dari kesantrian
+                    const { data: kesantrian } = await supabase
+                        .from('kesantrian')
+                        .select('pengurangan_poin')
+                        .eq('santri_id', santri.id);
+                    
+                    if (kesantrian) {
+                        totalPengurangan += kesantrian.reduce((sum, k) => sum + k.pengurangan_poin, 0);
+                    }
+                    
+                    // Hitung pengurangan dari kasus
+                    const { data: kasus } = await supabase
+                        .from('kasus')
+                        .select('pengurangan_poin')
+                        .eq('santri_id', santri.id);
+                    
+                    if (kasus) {
+                        totalPengurangan += kasus.reduce((sum, k) => sum + k.pengurangan_poin, 0);
+                    }
+                    
+                    // Hitung pengurangan dari pelanggaran
+                    const { data: pelanggaran } = await supabase
+                        .from('pelanggaran')
+                        .select('jenis_pelanggaran(pengurangan_point)')
+                        .eq('santri_id', santri.id);
+                    
+                    if (pelanggaran) {
+                        totalPengurangan += pelanggaran.reduce((sum, p) => sum + p.jenis_pelanggaran.pengurangan_point, 0);
+                    }
+                    
+                    // Update poin santri
+                    const newPoin = Math.max(0, 100 - totalPengurangan);
+                    await supabase
+                        .from('profiles')
+                        .update({ poin_kesantrian: newPoin })
+                        .eq('id', santri.id);
+                }
+                
+                // Reload data santri
+                await loadSantriData();
+                
+            } catch (error) {
+                console.error('Error updating santri points:', error);
+            }
         }
 
         // Setup Event Listeners
@@ -1248,6 +2008,53 @@
                 }
             });
 
+            // Edit Santri Form
+            editSantriForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editSantriForm, true);
+                    
+                    const id = document.getElementById('edit-santri-id').value;
+                    const santriData = {
+                        nama_lengkap: document.getElementById('edit-nama-santri').value,
+                        kelas: document.getElementById('edit-kelas-santri').value,
+                        asal: document.getElementById('edit-asal-santri').value,
+                        umur: parseInt(document.getElementById('edit-umur-santri').value),
+                        tanggal_masuk: document.getElementById('edit-tanggal-masuk').value,
+                        nama_wali: document.getElementById('edit-nama-wali').value,
+                        poin_kesantrian: parseInt(document.getElementById('edit-poin-santri').value)
+                    };
+                    
+                    await updateSantri(id, santriData);
+                    
+                    modalEditSantri.classList.add('hidden');
+                    editSantriForm.reset();
+                    
+                    // Reload data
+                    await loadSantriData();
+                    updateSantriDropdowns();
+                    loadSantriTable();
+                    loadDashboardData();
+                    
+                    showMessage('Data santri berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating santri:', error);
+                    showMessage('Gagal memperbarui data santri: ' + error.message, 'error');
+                } finally {
+                    showLoading(editSantriForm, false);
+                }
+            });
+
+            // Edit Santri Modal Controls
+            closeEditModal.addEventListener('click', function() {
+                modalEditSantri.classList.add('hidden');
+            });
+
+            batalEdit.addEventListener('click', function() {
+                modalEditSantri.classList.add('hidden');
+            });
+
             // Absensi
             absenForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1279,6 +2086,48 @@
                 } finally {
                     showLoading(absenForm, false);
                 }
+            });
+
+            // Edit Absensi Form
+            editAbsensiForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editAbsensiForm, true);
+                    
+                    const id = document.getElementById('edit-absensi-id').value;
+                    const absensiData = {
+                        tanggal: document.getElementById('edit-tanggal-absensi').value,
+                        status: document.getElementById('edit-status-absensi').value,
+                        keterangan: document.getElementById('edit-keterangan-absensi').value || null
+                    };
+                    
+                    await updateAbsensi(id, absensiData);
+                    
+                    modalEditAbsensi.classList.add('hidden');
+                    editAbsensiForm.reset();
+                    
+                    // Reload data
+                    await loadAbsensiData();
+                    loadAbsensiTable();
+                    loadDashboardData();
+                    
+                    showMessage('Data absensi berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating absensi:', error);
+                    showMessage('Gagal memperbarui data absensi: ' + error.message, 'error');
+                } finally {
+                    showLoading(editAbsensiForm, false);
+                }
+            });
+
+            // Edit Absensi Modal Controls
+            closeEditAbsensiModal.addEventListener('click', function() {
+                modalEditAbsensi.classList.add('hidden');
+            });
+
+            batalEditAbsensi.addEventListener('click', function() {
+                modalEditAbsensi.classList.add('hidden');
             });
 
             // Hafalan
@@ -1313,6 +2162,49 @@
                 } finally {
                     showLoading(hafalanForm, false);
                 }
+            });
+
+            // Edit Hafalan Form
+            editHafalanForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editHafalanForm, true);
+                    
+                    const id = document.getElementById('edit-hafalan-id').value;
+                    const hafalanData = {
+                        tanggal: document.getElementById('edit-tanggal-hafalan').value,
+                        halaman_awal: parseInt(document.getElementById('edit-halaman-awal').value),
+                        halaman_akhir: parseInt(document.getElementById('edit-halaman-akhir').value),
+                        catatan: document.getElementById('edit-catatan-hafalan').value || null
+                    };
+                    
+                    await updateHafalan(id, hafalanData);
+                    
+                    modalEditHafalan.classList.add('hidden');
+                    editHafalanForm.reset();
+                    
+                    // Reload data
+                    await loadHafalanData();
+                    loadHafalanTable();
+                    loadDashboardData();
+                    
+                    showMessage('Data hafalan berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating hafalan:', error);
+                    showMessage('Gagal memperbarui data hafalan: ' + error.message, 'error');
+                } finally {
+                    showLoading(editHafalanForm, false);
+                }
+            });
+
+            // Edit Hafalan Modal Controls
+            closeEditHafalanModal.addEventListener('click', function() {
+                modalEditHafalan.classList.add('hidden');
+            });
+
+            batalEditHafalan.addEventListener('click', function() {
+                modalEditHafalan.classList.add('hidden');
             });
 
             // Kesantrian
@@ -1379,6 +2271,68 @@
                 }
             });
 
+            // Edit Kesantrian Form
+            editKesantrianForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editKesantrianForm, true);
+                    
+                    const id = document.getElementById('edit-kesantrian-id').value;
+                    
+                    // Calculate point reduction
+                    const sikap = document.getElementById('edit-sikap-kesantrian').value;
+                    const disiplin = document.getElementById('edit-disiplin-kesantrian').value;
+                    const kebersihan = document.getElementById('edit-kebersihan-kesantrian').value;
+                    
+                    let pengurangan_poin = 0;
+                    if (sikap === 'kurang') pengurangan_poin += 5;
+                    if (sikap === 'cukup') pengurangan_poin += 2;
+                    if (disiplin === 'kurang') pengurangan_poin += 5;
+                    if (disiplin === 'cukup') pengurangan_poin += 2;
+                    if (kebersihan === 'kurang') pengurangan_poin += 5;
+                    if (kebersihan === 'cukup') pengurangan_poin += 2;
+                    
+                    const kesantrianData = {
+                        tanggal: document.getElementById('edit-tanggal-kesantrian').value,
+                        sikap: sikap,
+                        disiplin: disiplin,
+                        kebersihan: kebersihan,
+                        pelanggaran: document.getElementById('edit-pelanggaran-kesantrian').value || null,
+                        catatan: document.getElementById('edit-catatan-kesantrian').value || null,
+                        pengurangan_poin: pengurangan_poin
+                    };
+                    
+                    await updateKesantrian(id, kesantrianData);
+                    
+                    modalEditKesantrian.classList.add('hidden');
+                    editKesantrianForm.reset();
+                    
+                    // Reload data
+                    await loadSantriData();
+                    await loadKesantrianData();
+                    loadKesantrianTable();
+                    loadSantriTable();
+                    loadDashboardData();
+                    
+                    showMessage('Data kesantrian berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating kesantrian:', error);
+                    showMessage('Gagal memperbarui data kesantrian: ' + error.message, 'error');
+                } finally {
+                    showLoading(editKesantrianForm, false);
+                }
+            });
+
+            // Edit Kesantrian Modal Controls
+            closeEditKesantrianModal.addEventListener('click', function() {
+                modalEditKesantrian.classList.add('hidden');
+            });
+
+            batalEditKesantrian.addEventListener('click', function() {
+                modalEditKesantrian.classList.add('hidden');
+            });
+
             // Kasus
             kasusForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1426,6 +2380,51 @@
                 } finally {
                     showLoading(kasusForm, false);
                 }
+            });
+
+            // Edit Kasus Form
+            editKasusForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editKasusForm, true);
+                    
+                    const id = document.getElementById('edit-kasus-id').value;
+                    const kasusData = {
+                        tanggal: document.getElementById('edit-tanggal-kasus').value,
+                        deskripsi_kasus: document.getElementById('edit-deskripsi-kasus').value,
+                        penanganan: document.getElementById('edit-penanganan-kasus').value,
+                        pengurangan_poin: parseInt(document.getElementById('edit-poin-kasus').value)
+                    };
+                    
+                    await updateKasus(id, kasusData);
+                    
+                    modalEditKasus.classList.add('hidden');
+                    editKasusForm.reset();
+                    
+                    // Reload data
+                    await loadSantriData();
+                    await loadKasusData();
+                    loadKasusTable();
+                    loadSantriTable();
+                    loadDashboardData();
+                    
+                    showMessage('Data kasus berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating kasus:', error);
+                    showMessage('Gagal memperbarui data kasus: ' + error.message, 'error');
+                } finally {
+                    showLoading(editKasusForm, false);
+                }
+            });
+
+            // Edit Kasus Modal Controls
+            closeEditKasusModal.addEventListener('click', function() {
+                modalEditKasus.classList.add('hidden');
+            });
+
+            batalEditKasus.addEventListener('click', function() {
+                modalEditKasus.classList.add('hidden');
             });
 
             // Pelanggaran
@@ -1487,6 +2486,126 @@
                 }
             });
 
+            // Edit Pelanggaran Form
+            editPelanggaranForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(editPelanggaranForm, true);
+                    
+                    const id = document.getElementById('edit-pelanggaran-id').value;
+                    const jenisPelanggaranId = document.getElementById('edit-jenis-pelanggaran').value;
+                    const selectedJenis = jenisPelanggaranData.find(j => j.id === jenisPelanggaranId);
+                    
+                    const pelanggaranData = {
+                        jenis_pelanggaran_id: jenisPelanggaranId,
+                        tanggal: document.getElementById('edit-tanggal-pelanggaran').value,
+                        deskripsi: document.getElementById('edit-deskripsi-pelanggaran').value,
+                        sanksi_fisik_diberikan: document.getElementById('edit-sanksi-fisik').value || null
+                    };
+                    
+                    await updatePelanggaran(id, pelanggaranData);
+                    
+                    modalEditPelanggaran.classList.add('hidden');
+                    editPelanggaranForm.reset();
+                    
+                    // Reload data
+                    await loadSantriData();
+                    await loadPelanggaranData();
+                    loadPelanggaranTable();
+                    
+                    showMessage('Data pelanggaran berhasil diperbarui!', 'success');
+                } catch (error) {
+                    console.error('Error updating pelanggaran:', error);
+                    showMessage('Gagal memperbarui data pelanggaran: ' + error.message, 'error');
+                } finally {
+                    showLoading(editPelanggaranForm, false);
+                }
+            });
+
+            // Edit Pelanggaran Modal Controls
+            closeEditPelanggaranModal.addEventListener('click', function() {
+                modalEditPelanggaran.classList.add('hidden');
+            });
+
+            batalEditPelanggaran.addEventListener('click', function() {
+                modalEditPelanggaran.classList.add('hidden');
+            });
+
+            // Hapus Modal Controls
+            closeHapusModal.addEventListener('click', function() {
+                modalHapus.classList.add('hidden');
+            });
+
+            batalHapus.addEventListener('click', function() {
+                modalHapus.classList.add('hidden');
+            });
+
+            konfirmasiHapus.addEventListener('click', async function() {
+                try {
+                    if (currentEditId && currentEditType) {
+                        switch (currentEditType) {
+                            case 'santri':
+                                await deleteSantri(currentEditId);
+                                await loadSantriData();
+                                updateSantriDropdowns();
+                                loadSantriTable();
+                                loadDashboardData();
+                                showMessage('Data santri berhasil dihapus!', 'success');
+                                break;
+                            case 'absensi':
+                                await deleteAbsensi(currentEditId);
+                                await loadAbsensiData();
+                                loadAbsensiTable();
+                                loadDashboardData();
+                                showMessage('Data absensi berhasil dihapus!', 'success');
+                                break;
+                            case 'hafalan':
+                                await deleteHafalan(currentEditId);
+                                await loadHafalanData();
+                                loadHafalanTable();
+                                loadDashboardData();
+                                showMessage('Data hafalan berhasil dihapus!', 'success');
+                                break;
+                            case 'kesantrian':
+                                await deleteKesantrian(currentEditId);
+                                await loadSantriData();
+                                await loadKesantrianData();
+                                loadKesantrianTable();
+                                loadSantriTable();
+                                loadDashboardData();
+                                showMessage('Data kesantrian berhasil dihapus!', 'success');
+                                break;
+                            case 'kasus':
+                                await deleteKasus(currentEditId);
+                                await loadSantriData();
+                                await loadKasusData();
+                                loadKasusTable();
+                                loadSantriTable();
+                                loadDashboardData();
+                                showMessage('Data kasus berhasil dihapus!', 'success');
+                                break;
+                            case 'pelanggaran':
+                                await deletePelanggaran(currentEditId);
+                                await loadSantriData();
+                                await loadPelanggaranData();
+                                loadPelanggaranTable();
+                                loadSantriTable();
+                                loadDashboardData();
+                                showMessage('Data pelanggaran berhasil dihapus!', 'success');
+                                break;
+                        }
+                    }
+                    
+                    modalHapus.classList.add('hidden');
+                    currentEditId = null;
+                    currentEditType = null;
+                } catch (error) {
+                    console.error('Error deleting data:', error);
+                    showMessage('Gagal menghapus data: ' + error.message, 'error');
+                }
+            });
+
             // Event listener untuk perubahan jenis pelanggaran
             jenisPelanggaranSelect.addEventListener('change', function() {
                 const selectedId = this.value;
@@ -1498,6 +2617,16 @@
                         <strong>Pengurangan Point:</strong> ${selectedJenis.pengurangan_point}<br>
                         <strong>Sanksi Fisik:</strong> ${selectedJenis.sanksi_fisik || 'Tidak ada sanksi fisik'}
                     `;
+                }
+            });
+
+            // Event listener untuk perubahan jenis pelanggaran di edit modal
+            document.getElementById('edit-jenis-pelanggaran').addEventListener('change', function() {
+                const selectedId = this.value;
+                const selectedJenis = jenisPelanggaranData.find(j => j.id === selectedId);
+                
+                if (selectedJenis) {
+                    document.getElementById('edit-sanksi-fisik').value = selectedJenis.sanksi_fisik || '';
                 }
             });
 
@@ -1522,6 +2651,67 @@
             closeModal.addEventListener('click', function() {
                 modalSantri.classList.add('hidden');
             });
+
+            // Export Buttons
+            if (exportSantriPdfBtn) {
+                exportSantriPdfBtn.addEventListener('click', () => exportToPDF('santri'));
+            }
+            if (exportSantriExcelBtn) {
+                exportSantriExcelBtn.addEventListener('click', () => exportToExcel('santri'));
+            }
+            if (exportAbsenPdfBtn) {
+                exportAbsenPdfBtn.addEventListener('click', () => exportToPDF('absensi'));
+            }
+            if (exportAbsenExcelBtn) {
+                exportAbsenExcelBtn.addEventListener('click', () => exportToExcel('absensi'));
+            }
+            if (exportHafalanPdfBtn) {
+                exportHafalanPdfBtn.addEventListener('click', () => exportToPDF('hafalan'));
+            }
+            if (exportHafalanExcelBtn) {
+                exportHafalanExcelBtn.addEventListener('click', () => exportToExcel('hafalan'));
+            }
+            if (exportKesantrianPdfBtn) {
+                exportKesantrianPdfBtn.addEventListener('click', () => exportToPDF('kesantrian'));
+            }
+            if (exportKesantrianExcelBtn) {
+                exportKesantrianExcelBtn.addEventListener('click', () => exportToExcel('kesantrian'));
+            }
+            if (exportKasusPdfBtn) {
+                exportKasusPdfBtn.addEventListener('click', () => exportToPDF('kasus'));
+            }
+            if (exportKasusExcelBtn) {
+                exportKasusExcelBtn.addEventListener('click', () => exportToExcel('kasus'));
+            }
+            if (exportPelanggaranPdfBtn) {
+                exportPelanggaranPdfBtn.addEventListener('click', () => exportToPDF('pelanggaran'));
+            }
+            if (exportPelanggaranExcelBtn) {
+                exportPelanggaranExcelBtn.addEventListener('click', () => exportToExcel('pelanggaran'));
+            }
+
+            // Refresh Points Button
+            const refreshPointsBtn = document.getElementById('refresh-points');
+            if (refreshPointsBtn) {
+                refreshPointsBtn.addEventListener('click', async function() {
+                    try {
+                        this.disabled = true;
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Refreshing...';
+                        
+                        await updateAllSantriPoints();
+                        
+                        loadSantriTable();
+                        loadDashboardData();
+                        
+                        showMessage('Poin santri berhasil diperbarui!', 'success');
+                    } catch (error) {
+                        showMessage('Gagal memperbarui poin: ' + error.message, 'error');
+                    } finally {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Refresh Poin';
+                    }
+                });
+            }
         }
 
         // UI Update Functions
@@ -1564,6 +2754,12 @@
                 
                 filterBabPelanggaran.innerHTML = '<option value="">Semua Bab</option>' + babOptions;
             }
+            
+            // Update edit dropdown
+            const editDropdown = document.getElementById('edit-jenis-pelanggaran');
+            if (editDropdown) {
+                editDropdown.innerHTML = '<option value="">Pilih jenis pelanggaran...</option>' + options;
+            }
         }
 
         function loadSantriTable() {
@@ -1596,19 +2792,39 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <button class="text-primary hover:text-santri view-santri" data-id="${santri.id}">
-                            <i class="fas fa-eye mr-1"></i> Detail
+                        <button class="text-primary hover:text-santri view-santri mr-2" data-id="${santri.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-warning hover:text-yellow-600 edit-santri mr-2" data-id="${santri.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-santri" data-id="${santri.id}">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
                 santriTableBody.appendChild(row);
             });
             
-            // Add event listeners to view buttons
+            // Add event listeners to buttons
             document.querySelectorAll('.view-santri').forEach(button => {
                 button.addEventListener('click', function() {
                     const santriId = this.getAttribute('data-id');
                     showSantriDetail(santriId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-santri').forEach(button => {
+                button.addEventListener('click', function() {
+                    const santriId = this.getAttribute('data-id');
+                    showEditSantriModal(santriId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-santri').forEach(button => {
+                button.addEventListener('click', function() {
+                    const santriId = this.getAttribute('data-id');
+                    showHapusModal(santriId, 'santri');
                 });
             });
         }
@@ -1628,7 +2844,7 @@
             if (filteredAbsensi.length === 0) {
                 absenTableBody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada data absensi
                         </td>
                     </tr>
@@ -1653,8 +2869,31 @@
                         <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass} capitalize">${absensi.status}</span>
                     </td>
                     <td class="px-6 py-4">${absensi.keterangan || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="text-warning hover:text-yellow-600 edit-absensi mr-2" data-id="${absensi.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-absensi" data-id="${absensi.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 absenTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-absensi').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showEditAbsensiModal(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-absensi').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showHapusModal(id, 'absensi');
+                });
             });
         }
 
@@ -1674,7 +2913,7 @@
             if (filteredHafalan.length === 0) {
                 hafalanTableBody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada data hafalan
                         </td>
                     </tr>
@@ -1690,8 +2929,31 @@
                     <td class="px-6 py-4 whitespace-nowrap font-medium">${hafalan.profiles.nama_lengkap}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${hafalan.halaman_awal} - ${hafalan.halaman_akhir}</td>
                     <td class="px-6 py-4">${hafalan.catatan || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="text-warning hover:text-yellow-600 edit-hafalan mr-2" data-id="${hafalan.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-hafalan" data-id="${hafalan.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 hafalanTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-hafalan').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showEditHafalanModal(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-hafalan').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showHapusModal(id, 'hafalan');
+                });
             });
         }
 
@@ -1711,7 +2973,7 @@
             if (filteredKesantrian.length === 0) {
                 kesantrianTableBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada data kesantrian
                         </td>
                     </tr>
@@ -1739,8 +3001,31 @@
                         <span class="px-2 py-1 rounded-full text-xs font-medium ${kebersihanClass} capitalize">${kesantrian.kebersihan}</span>
                     </td>
                     <td class="px-6 py-4">${kesantrian.catatan || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="text-warning hover:text-yellow-600 edit-kesantrian mr-2" data-id="${kesantrian.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-kesantrian" data-id="${kesantrian.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 kesantrianTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-kesantrian').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showEditKesantrianModal(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-kesantrian').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showHapusModal(id, 'kesantrian');
+                });
             });
         }
 
@@ -1760,7 +3045,7 @@
             if (filteredKasus.length === 0) {
                 kasusTableBody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada data kasus
                         </td>
                     </tr>
@@ -1777,8 +3062,31 @@
                     <td class="px-6 py-4">${kasus.deskripsi_kasus}</td>
                     <td class="px-6 py-4">${kasus.penanganan}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">-${kasus.pengurangan_poin}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="text-warning hover:text-yellow-600 edit-kasus mr-2" data-id="${kasus.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-kasus" data-id="${kasus.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 kasusTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-kasus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showEditKasusModal(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-kasus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showHapusModal(id, 'kasus');
+                });
             });
         }
 
@@ -1803,7 +3111,7 @@
             if (filteredPelanggaran.length === 0) {
                 pelanggaranTableBody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada data pelanggaran
                         </td>
                     </tr>
@@ -1829,8 +3137,31 @@
                         <p class="text-sm">${pelanggaran.jenis_pelanggaran.sanksi_fisik || '-'}</p>
                         ${pelanggaran.sanksi_fisik_diberikan ? `<p class="text-xs text-gray-500 mt-1">Diberikan: ${pelanggaran.sanksi_fisik_diberikan}</p>` : ''}
                     </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="text-warning hover:text-yellow-600 edit-pelanggaran mr-2" data-id="${pelanggaran.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-danger hover:text-red-600 delete-pelanggaran" data-id="${pelanggaran.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
                 `;
                 pelanggaranTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-pelanggaran').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showEditPelanggaranModal(id);
+                });
+            });
+            
+            document.querySelectorAll('.delete-pelanggaran').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    showHapusModal(id, 'pelanggaran');
+                });
             });
         }
 
@@ -2199,6 +3530,299 @@
             
             // Show modal
             modalSantri.classList.remove('hidden');
+        }
+
+        // Edit Modal Functions
+        function showEditSantriModal(santriId) {
+            const santri = santriData.find(s => s.id === santriId);
+            if (!santri) return;
+            
+            // Fill form with data
+            document.getElementById('edit-santri-id').value = santri.id;
+            document.getElementById('edit-nama-santri').value = santri.nama_lengkap;
+            document.getElementById('edit-kelas-santri').value = santri.kelas;
+            document.getElementById('edit-asal-santri').value = santri.asal;
+            document.getElementById('edit-umur-santri').value = santri.umur;
+            document.getElementById('edit-tanggal-masuk').value = santri.tanggal_masuk;
+            document.getElementById('edit-nama-wali').value = santri.nama_wali;
+            document.getElementById('edit-poin-santri').value = santri.poin_kesantrian;
+            
+            // Show modal
+            modalEditSantri.classList.remove('hidden');
+        }
+
+        function showEditAbsensiModal(id) {
+            const absensi = absensiData.find(a => a.id === id);
+            if (!absensi) return;
+            
+            // Fill form with data
+            document.getElementById('edit-absensi-id').value = absensi.id;
+            document.getElementById('edit-tanggal-absensi').value = absensi.tanggal;
+            document.getElementById('edit-status-absensi').value = absensi.status;
+            document.getElementById('edit-keterangan-absensi').value = absensi.keterangan || '';
+            
+            // Show modal
+            modalEditAbsensi.classList.remove('hidden');
+        }
+
+        function showEditHafalanModal(id) {
+            const hafalan = hafalanData.find(h => h.id === id);
+            if (!hafalan) return;
+            
+            // Fill form with data
+            document.getElementById('edit-hafalan-id').value = hafalan.id;
+            document.getElementById('edit-tanggal-hafalan').value = hafalan.tanggal;
+            document.getElementById('edit-halaman-awal').value = hafalan.halaman_awal;
+            document.getElementById('edit-halaman-akhir').value = hafalan.halaman_akhir;
+            document.getElementById('edit-catatan-hafalan').value = hafalan.catatan || '';
+            
+            // Show modal
+            modalEditHafalan.classList.remove('hidden');
+        }
+
+        function showEditKesantrianModal(id) {
+            const kesantrian = kesantrianData.find(k => k.id === id);
+            if (!kesantrian) return;
+            
+            // Fill form with data
+            document.getElementById('edit-kesantrian-id').value = kesantrian.id;
+            document.getElementById('edit-tanggal-kesantrian').value = kesantrian.tanggal;
+            document.getElementById('edit-sikap-kesantrian').value = kesantrian.sikap;
+            document.getElementById('edit-disiplin-kesantrian').value = kesantrian.disiplin;
+            document.getElementById('edit-kebersihan-kesantrian').value = kesantrian.kebersihan;
+            document.getElementById('edit-pelanggaran-kesantrian').value = kesantrian.pelanggaran || '';
+            document.getElementById('edit-catatan-kesantrian').value = kesantrian.catatan || '';
+            
+            // Show modal
+            modalEditKesantrian.classList.remove('hidden');
+        }
+
+        function showEditKasusModal(id) {
+            const kasus = kasusData.find(k => k.id === id);
+            if (!kasus) return;
+            
+            // Fill form with data
+            document.getElementById('edit-kasus-id').value = kasus.id;
+            document.getElementById('edit-tanggal-kasus').value = kasus.tanggal;
+            document.getElementById('edit-deskripsi-kasus').value = kasus.deskripsi_kasus;
+            document.getElementById('edit-penanganan-kasus').value = kasus.penanganan;
+            document.getElementById('edit-poin-kasus').value = kasus.pengurangan_poin;
+            
+            // Show modal
+            modalEditKasus.classList.remove('hidden');
+        }
+
+        function showEditPelanggaranModal(id) {
+            const pelanggaran = pelanggaranData.find(p => p.id === id);
+            if (!pelanggaran) return;
+            
+            // Fill form with data
+            document.getElementById('edit-pelanggaran-id').value = pelanggaran.id;
+            document.getElementById('edit-tanggal-pelanggaran').value = pelanggaran.tanggal;
+            document.getElementById('edit-jenis-pelanggaran').value = pelanggaran.jenis_pelanggaran_id;
+            document.getElementById('edit-deskripsi-pelanggaran').value = pelanggaran.deskripsi || '';
+            document.getElementById('edit-sanksi-fisik').value = pelanggaran.sanksi_fisik_diberikan || '';
+            
+            // Show modal
+            modalEditPelanggaran.classList.remove('hidden');
+        }
+
+        function showHapusModal(id, type) {
+            currentEditId = id;
+            currentEditType = type;
+            modalHapus.classList.remove('hidden');
+        }
+
+        // Export Functions
+        function exportToPDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            let title = '';
+            let data = [];
+            let headers = [];
+            
+            switch(type) {
+                case 'santri':
+                    title = 'Data Santri';
+                    headers = ['Nama', 'Kelas', 'Asal', 'Umur', 'Poin'];
+                    data = santriData.map(s => [
+                        s.nama_lengkap,
+                        s.kelas,
+                        s.asal,
+                        s.umur.toString(),
+                        s.poin_kesantrian.toString()
+                    ]);
+                    break;
+                case 'absensi':
+                    title = 'Data Absensi';
+                    headers = ['Tanggal', 'Nama', 'Status', 'Keterangan'];
+                    data = absensiData.map(a => [
+                        formatDate(a.tanggal),
+                        a.profiles.nama_lengkap,
+                        a.status,
+                        a.keterangan || '-'
+                    ]);
+                    break;
+                case 'hafalan':
+                    title = 'Data Hafalan';
+                    headers = ['Tanggal', 'Nama', 'Halaman', 'Catatan'];
+                    data = hafalanData.map(h => [
+                        formatDate(h.tanggal),
+                        h.profiles.nama_lengkap,
+                        `${h.halaman_awal} - ${h.halaman_akhir}`,
+                        h.catatan || '-'
+                    ]);
+                    break;
+                case 'kesantrian':
+                    title = 'Data Kesantrian';
+                    headers = ['Tanggal', 'Nama', 'Sikap', 'Disiplin', 'Kebersihan', 'Catatan'];
+                    data = kesantrianData.map(k => [
+                        formatDate(k.tanggal),
+                        k.profiles.nama_lengkap,
+                        k.sikap,
+                        k.disiplin,
+                        k.kebersihan,
+                        k.catatan || '-'
+                    ]);
+                    break;
+                case 'kasus':
+                    title = 'Data Kasus';
+                    headers = ['Tanggal', 'Nama', 'Kasus', 'Penanganan', 'Poin'];
+                    data = kasusData.map(k => [
+                        formatDate(k.tanggal),
+                        k.profiles.nama_lengkap,
+                        k.deskripsi_kasus,
+                        k.penanganan,
+                        `-${k.pengurangan_poin}`
+                    ]);
+                    break;
+                case 'pelanggaran':
+                    title = 'Data Pelanggaran';
+                    headers = ['Tanggal', 'Nama', 'Pelanggaran', 'Pengurangan', 'Sanksi'];
+                    data = pelanggaranData.map(p => [
+                        formatDate(p.tanggal),
+                        p.profiles.nama_lengkap,
+                        `${p.jenis_pelanggaran.kode} - ${p.jenis_pelanggaran.deskripsi}`,
+                        `-${p.jenis_pelanggaran.pengurangan_point}`,
+                        p.jenis_pelanggaran.sanksi_fisik || '-'
+                    ]);
+                    break;
+            }
+            
+            doc.text(title, 14, 15);
+            
+            // Add table
+            doc.autoTable({
+                head: [headers],
+                body: data,
+                startY: 25,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [30, 58, 138],
+                    textColor: 255
+                }
+            });
+            
+            // Save PDF
+            doc.save(`${title}_${new Date().toISOString().split('T')[0]}.pdf`);
+            showMessage(`Data ${title} berhasil diexport ke PDF!`, 'success');
+        }
+
+        function exportToExcel(type) {
+            let title = '';
+            let data = [];
+            let headers = [];
+            
+            switch(type) {
+                case 'santri':
+                    title = 'Data Santri';
+                    headers = ['Nama', 'Kelas', 'Asal', 'Umur', 'Tanggal Masuk', 'Nama Wali', 'Poin'];
+                    data = santriData.map(s => ({
+                        'Nama': s.nama_lengkap,
+                        'Kelas': s.kelas,
+                        'Asal': s.asal,
+                        'Umur': s.umur,
+                        'Tanggal Masuk': s.tanggal_masuk,
+                        'Nama Wali': s.nama_wali,
+                        'Poin': s.poin_kesantrian
+                    }));
+                    break;
+                case 'absensi':
+                    title = 'Data Absensi';
+                    headers = ['Tanggal', 'Nama Santri', 'Status', 'Keterangan'];
+                    data = absensiData.map(a => ({
+                        'Tanggal': formatDate(a.tanggal),
+                        'Nama Santri': a.profiles.nama_lengkap,
+                        'Status': a.status,
+                        'Keterangan': a.keterangan || '-'
+                    }));
+                    break;
+                case 'hafalan':
+                    title = 'Data Hafalan';
+                    headers = ['Tanggal', 'Nama Santri', 'Halaman Awal', 'Halaman Akhir', 'Catatan'];
+                    data = hafalanData.map(h => ({
+                        'Tanggal': formatDate(h.tanggal),
+                        'Nama Santri': h.profiles.nama_lengkap,
+                        'Halaman Awal': h.halaman_awal,
+                        'Halaman Akhir': h.halaman_akhir,
+                        'Catatan': h.catatan || '-'
+                    }));
+                    break;
+                case 'kesantrian':
+                    title = 'Data Kesantrian';
+                    headers = ['Tanggal', 'Nama Santri', 'Sikap', 'Disiplin', 'Kebersihan', 'Pelanggaran', 'Catatan', 'Pengurangan Poin'];
+                    data = kesantrianData.map(k => ({
+                        'Tanggal': formatDate(k.tanggal),
+                        'Nama Santri': k.profiles.nama_lengkap,
+                        'Sikap': k.sikap,
+                        'Disiplin': k.disiplin,
+                        'Kebersihan': k.kebersihan,
+                        'Pelanggaran': k.pelanggaran || '-',
+                        'Catatan': k.catatan || '-',
+                        'Pengurangan Poin': k.pengurangan_poin
+                    }));
+                    break;
+                case 'kasus':
+                    title = 'Data Kasus';
+                    headers = ['Tanggal', 'Nama Santri', 'Deskripsi Kasus', 'Penanganan', 'Pengurangan Poin'];
+                    data = kasusData.map(k => ({
+                        'Tanggal': formatDate(k.tanggal),
+                        'Nama Santri': k.profiles.nama_lengkap,
+                        'Deskripsi Kasus': k.deskripsi_kasus,
+                        'Penanganan': k.penanganan,
+                        'Pengurangan Poin': k.pengurangan_poin
+                    }));
+                    break;
+                case 'pelanggaran':
+                    title = 'Data Pelanggaran';
+                    headers = ['Tanggal', 'Nama Santri', 'Kode Pelanggaran', 'Deskripsi', 'Pengurangan Point', 'Sanksi Fisik', 'Sanksi Diberikan'];
+                    data = pelanggaranData.map(p => ({
+                        'Tanggal': formatDate(p.tanggal),
+                        'Nama Santri': p.profiles.nama_lengkap,
+                        'Kode Pelanggaran': p.jenis_pelanggaran.kode,
+                        'Deskripsi': p.jenis_pelanggaran.deskripsi,
+                        'Pengurangan Point': p.jenis_pelanggaran.pengurangan_point,
+                        'Sanksi Fisik': p.jenis_pelanggaran.sanksi_fisik || '-',
+                        'Sanksi Diberikan': p.sanksi_fisik_diberikan || '-'
+                    }));
+                    break;
+            }
+            
+            // Create worksheet
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, title);
+            
+            // Save Excel file
+            XLSX.writeFile(wb, `${title}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showMessage(`Data ${title} berhasil diexport ke Excel!`, 'success');
         }
 
         // Utility Functions
