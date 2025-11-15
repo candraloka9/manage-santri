@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -131,6 +132,7 @@
                     <li><button id="tab-hafalan" class="tab-button px-4 py-3 font-medium"><i class="fas fa-book-quran mr-2"></i>Hafalan</button></li>
                     <li><button id="tab-kesantrian" class="tab-button px-4 py-3 font-medium"><i class="fas fa-user-check mr-2"></i>Kesantrian</button></li>
                     <li><button id="tab-kasus" class="tab-button px-4 py-3 font-medium"><i class="fas fa-exclamation-triangle mr-2"></i>Kasus</button></li>
+                    <li><button id="tab-sanksi" class="tab-button px-4 py-3 font-medium"><i class="fas fa-gavel mr-2"></i>Sanksi</button></li>
                 </ul>
             </div>
         </nav>
@@ -185,8 +187,8 @@
                                 <i class="fas fa-exclamation-triangle text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">Kasus Aktif</p>
-                                <h3 class="text-2xl font-bold" id="total-kasus">0</h3>
+                                <p class="text-sm font-medium text-gray-600">Pelanggaran</p>
+                                <h3 class="text-2xl font-bold" id="total-pelanggaran">0</h3>
                             </div>
                         </div>
                     </div>
@@ -592,6 +594,101 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Sanksi & Pelanggaran Section -->
+            <section id="sanksi" class="content-section hidden fade-in">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Sanksi & Pelanggaran</h2>
+                
+                <!-- Form Input Pelanggaran -->
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Input Pelanggaran Santri</h3>
+                    <form id="pelanggaran-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Santri</label>
+                            <select id="santri-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="">Memuat data santri...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="tanggal-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Pelanggaran</label>
+                            <select id="jenis-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <option value="">Pilih jenis pelanggaran...</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Pelanggaran</label>
+                            <textarea id="deskripsi-pelanggaran" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="3" required placeholder="Deskripsi detail pelanggaran yang dilakukan"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sanksi Fisik yang Diberikan</label>
+                            <textarea id="sanksi-fisik" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" rows="2" placeholder="Sanksi fisik yang telah diberikan"></textarea>
+                        </div>
+                        <div class="md:col-span-2 bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-yellow-800 mb-2">Informasi Sanksi</h4>
+                            <div id="info-sanksi" class="text-sm text-yellow-700">
+                                Pilih jenis pelanggaran untuk melihat informasi sanksi
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-santri">Simpan Pelanggaran</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Daftar Pelanggaran -->
+                <div class="bg-white rounded-xl shadow overflow-hidden mb-6">
+                    <div class="p-4 border-b flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Riwayat Pelanggaran</h3>
+                        <div class="flex space-x-2">
+                            <select id="filter-santri-pelanggaran" class="px-3 py-1 border border-gray-300 rounded-md">
+                                <option value="">Semua Santri</option>
+                            </select>
+                            <select id="filter-bab-pelanggaran" class="px-3 py-1 border border-gray-300 rounded-md">
+                                <option value="">Semua Bab</option>
+                            </select>
+                            <button id="filter-pelanggaran" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300">Filter</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Santri</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggaran</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pengurangan Point</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sanksi Fisik</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pelanggaran-table-body" class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin"></i> Memuat data pelanggaran...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Kategori Pelanggaran -->
+                <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <h3 class="text-lg font-semibold text-gray-800">Kategori Pelanggaran</h3>
+                    </div>
+                    <div class="p-4">
+                        <div id="kategori-pelanggaran" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="text-center py-4 text-gray-500">
+                                <i class="fas fa-spinner fa-spin"></i> Memuat data kategori...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <!-- Modal Detail Santri -->
@@ -715,6 +812,8 @@
         let hafalanData = [];
         let kesantrianData = [];
         let kasusData = [];
+        let pelanggaranData = [];
+        let jenisPelanggaranData = [];
 
         // DOM Elements
         const loginSection = document.getElementById('login-section');
@@ -731,7 +830,7 @@
         const totalSantriElement = document.getElementById('total-santri');
         const hadirHariIniElement = document.getElementById('hadir-hari-ini');
         const totalHalamanElement = document.getElementById('total-halaman');
-        const totalKasusElement = document.getElementById('total-kasus');
+        const totalPelanggaranElement = document.getElementById('total-pelanggaran');
         const recentActivitiesElement = document.getElementById('recent-activities');
         const topSantriElement = document.getElementById('top-santri');
         const lowPointSantriElement = document.getElementById('low-point-santri');
@@ -771,6 +870,17 @@
         const filterSantriKasus = document.getElementById('filter-santri-kasus');
         const filterKasusBtn = document.getElementById('filter-kasus');
         
+        // Sanksi Elements
+        const pelanggaranForm = document.getElementById('pelanggaran-form');
+        const santriPelanggaranSelect = document.getElementById('santri-pelanggaran');
+        const jenisPelanggaranSelect = document.getElementById('jenis-pelanggaran');
+        const pelanggaranTableBody = document.getElementById('pelanggaran-table-body');
+        const filterSantriPelanggaran = document.getElementById('filter-santri-pelanggaran');
+        const filterBabPelanggaran = document.getElementById('filter-bab-pelanggaran');
+        const filterPelanggaranBtn = document.getElementById('filter-pelanggaran');
+        const infoSanksi = document.getElementById('info-sanksi');
+        const kategoriPelanggaranElement = document.getElementById('kategori-pelanggaran');
+        
         // Modal Elements
         const modalSantri = document.getElementById('modal-santri');
         const closeModal = document.getElementById('close-modal');
@@ -807,6 +917,7 @@
             document.getElementById('tanggal-kesantrian').valueAsDate = now;
             document.getElementById('tanggal-kasus').valueAsDate = now;
             document.getElementById('tanggal-masuk').valueAsDate = now;
+            document.getElementById('tanggal-pelanggaran').valueAsDate = now;
             if (filterTanggalAbsen) filterTanggalAbsen.valueAsDate = now;
             
             // Check if user is already logged in
@@ -879,7 +990,9 @@
                     loadAbsensiData(),
                     loadHafalanData(),
                     loadKesantrianData(),
-                    loadKasusData()
+                    loadKasusData(),
+                    loadPelanggaranData(),
+                    loadJenisPelanggaran()
                 ]);
                 
                 updateSantriDropdowns();
@@ -889,6 +1002,8 @@
                 loadHafalanTable();
                 loadKesantrianTable();
                 loadKasusTable();
+                loadPelanggaranTable();
+                loadKategoriView();
             } catch (error) {
                 console.error('Error loading data:', error);
                 showMessage('Gagal memuat data: ' + error.message, 'error');
@@ -945,6 +1060,38 @@
             kasusData = data || [];
         }
 
+        async function loadPelanggaranData() {
+            const { data, error } = await supabase
+                .from('pelanggaran')
+                .select('*, profiles(nama_lengkap), jenis_pelanggaran(kode, deskripsi, pengurangan_point, sanksi_fisik, kategori_pelanggaran(bab, nama_bab))')
+                .order('tanggal', { ascending: false });
+            
+            if (error) throw error;
+            pelanggaranData = data || [];
+        }
+
+        async function loadJenisPelanggaran() {
+            const { data, error } = await supabase
+                .from('jenis_pelanggaran')
+                .select('*, kategori_pelanggaran(bab, nama_bab)')
+                .order('kode');
+            
+            if (error) throw error;
+            jenisPelanggaranData = data || [];
+            updateJenisPelanggaranDropdown();
+            return data || [];
+        }
+
+        async function loadKategoriPelanggaran() {
+            const { data, error } = await supabase
+                .from('kategori_pelanggaran')
+                .select('*')
+                .order('bab');
+            
+            if (error) throw error;
+            return data || [];
+        }
+
         // CRUD Operations
         async function createSantri(santriData) {
             const { data, error } = await supabase
@@ -994,6 +1141,32 @@
             
             if (error) throw error;
             return data[0];
+        }
+
+        async function createPelanggaran(pelanggaranData) {
+            const { data, error } = await supabase
+                .from('pelanggaran')
+                .insert([pelanggaranData])
+                .select();
+            
+            if (error) throw error;
+            return data[0];
+        }
+
+        // Update poin santri setelah pelanggaran
+        async function updatePoinSantri(santriId, penguranganPoint) {
+            const santri = santriData.find(s => s.id === santriId);
+            if (santri) {
+                const newPoints = Math.max(0, santri.poin_kesantrian - penguranganPoint);
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ poin_kesantrian: newPoints })
+                    .eq('id', santri.id);
+                
+                if (error) throw error;
+                return newPoints;
+            }
+            return santri.poin_kesantrian;
         }
 
         // Setup Event Listeners
@@ -1255,6 +1428,79 @@
                 }
             });
 
+            // Pelanggaran
+            pelanggaranForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    showLoading(pelanggaranForm, true);
+                    
+                    const jenisPelanggaranId = document.getElementById('jenis-pelanggaran').value;
+                    const selectedJenis = jenisPelanggaranData.find(j => j.id === jenisPelanggaranId);
+                    
+                    const pelanggaranData = {
+                        santri_id: document.getElementById('santri-pelanggaran').value,
+                        jenis_pelanggaran_id: jenisPelanggaranId,
+                        tanggal: document.getElementById('tanggal-pelanggaran').value,
+                        deskripsi: document.getElementById('deskripsi-pelanggaran').value,
+                        sanksi_fisik_diberikan: document.getElementById('sanksi-fisik').value || null,
+                        point_sebelum: santriData.find(s => s.id === document.getElementById('santri-pelanggaran').value).poin_kesantrian,
+                        point_sesudah: 0 // akan diupdate
+                    };
+                    
+                    // Create pelanggaran
+                    await createPelanggaran(pelanggaranData);
+                    
+                    // Update poin santri
+                    const newPoints = await updatePoinSantri(
+                        pelanggaranData.santri_id, 
+                        selectedJenis.pengurangan_point
+                    );
+                    
+                    pelanggaranData.point_sesudah = newPoints;
+                    
+                    // Update record dengan point_sesudah
+                    await supabase
+                        .from('pelanggaran')
+                        .update({ point_sesudah: newPoints })
+                        .eq('santri_id', pelanggaranData.santri_id)
+                        .eq('tanggal', pelanggaranData.tanggal);
+                    
+                    // Reset form
+                    pelanggaranForm.reset();
+                    document.getElementById('tanggal-pelanggaran').valueAsDate = new Date();
+                    document.getElementById('info-sanksi').innerHTML = 'Pilih jenis pelanggaran untuk melihat informasi sanksi';
+                    
+                    // Reload data
+                    await loadSantriData();
+                    await loadPelanggaranData();
+                    loadPelanggaranTable();
+                    loadSantriTable();
+                    loadDashboardData();
+                    
+                    showMessage('Pelanggaran berhasil dicatat!', 'success');
+                } catch (error) {
+                    console.error('Error creating pelanggaran:', error);
+                    showMessage('Gagal mencatat pelanggaran: ' + error.message, 'error');
+                } finally {
+                    showLoading(pelanggaranForm, false);
+                }
+            });
+
+            // Event listener untuk perubahan jenis pelanggaran
+            jenisPelanggaranSelect.addEventListener('change', function() {
+                const selectedId = this.value;
+                const selectedJenis = jenisPelanggaranData.find(j => j.id === selectedId);
+                
+                if (selectedJenis) {
+                    infoSanksi.innerHTML = `
+                        <strong>${selectedJenis.kode}</strong><br>
+                        <strong>Pengurangan Point:</strong> ${selectedJenis.pengurangan_point}<br>
+                        <strong>Sanksi Fisik:</strong> ${selectedJenis.sanksi_fisik || 'Tidak ada sanksi fisik'}
+                    `;
+                }
+            });
+
             // Filters
             if (filterAbsenBtn) {
                 filterAbsenBtn.addEventListener('click', loadAbsensiTable);
@@ -1267,6 +1513,9 @@
             }
             if (filterKasusBtn) {
                 filterKasusBtn.addEventListener('click', loadKasusTable);
+            }
+            if (filterPelanggaranBtn) {
+                filterPelanggaranBtn.addEventListener('click', loadPelanggaranTable);
             }
 
             // Modal
@@ -1287,12 +1536,34 @@
             if (santriHafalanSelect) santriHafalanSelect.innerHTML = defaultOption + santriOptions;
             if (santriKesantrianSelect) santriKesantrianSelect.innerHTML = defaultOption + santriOptions;
             if (santriKasusSelect) santriKasusSelect.innerHTML = defaultOption + santriOptions;
+            if (santriPelanggaranSelect) santriPelanggaranSelect.innerHTML = defaultOption + santriOptions;
             
             // Update filter dropdowns
             const filterOptions = '<option value="">Semua Santri</option>' + santriOptions;
             if (filterSantriHafalan) filterSantriHafalan.innerHTML = filterOptions;
             if (filterSantriKesantrian) filterSantriKesantrian.innerHTML = filterOptions;
             if (filterSantriKasus) filterSantriKasus.innerHTML = filterOptions;
+            if (filterSantriPelanggaran) filterSantriPelanggaran.innerHTML = filterOptions;
+        }
+
+        function updateJenisPelanggaranDropdown() {
+            if (!jenisPelanggaranSelect) return;
+            
+            const options = jenisPelanggaranData.map(jenis => 
+                `<option value="${jenis.id}">${jenis.kode} - ${jenis.deskripsi} (-${jenis.pengurangan_point} point)</option>`
+            ).join('');
+            
+            jenisPelanggaranSelect.innerHTML = '<option value="">Pilih jenis pelanggaran...</option>' + options;
+            
+            // Update filter bab dropdown
+            if (filterBabPelanggaran) {
+                const uniqueBab = [...new Set(jenisPelanggaranData.map(j => j.kategori_pelanggaran.bab))];
+                const babOptions = uniqueBab.map(bab => 
+                    `<option value="${bab}">Bab ${bab}</option>`
+                ).join('');
+                
+                filterBabPelanggaran.innerHTML = '<option value="">Semua Bab</option>' + babOptions;
+            }
         }
 
         function loadSantriTable() {
@@ -1511,6 +1782,95 @@
             });
         }
 
+        function loadPelanggaranTable() {
+            if (!pelanggaranTableBody) return;
+            
+            pelanggaranTableBody.innerHTML = '';
+            
+            let filteredPelanggaran = [...pelanggaranData];
+            
+            // Apply filters
+            if (filterSantriPelanggaran && filterSantriPelanggaran.value) {
+                filteredPelanggaran = filteredPelanggaran.filter(p => p.santri_id === filterSantriPelanggaran.value);
+            }
+            
+            if (filterBabPelanggaran && filterBabPelanggaran.value) {
+                filteredPelanggaran = filteredPelanggaran.filter(p => 
+                    p.jenis_pelanggaran.kategori_pelanggaran.bab === filterBabPelanggaran.value
+                );
+            }
+            
+            if (filteredPelanggaran.length === 0) {
+                pelanggaranTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            Tidak ada data pelanggaran
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredPelanggaran.forEach(pelanggaran => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${formatDate(pelanggaran.tanggal)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-medium">${pelanggaran.profiles.nama_lengkap}</td>
+                    <td class="px-6 py-4">
+                        <div>
+                            <span class="font-medium">${pelanggaran.jenis_pelanggaran.kode}</span>
+                            <p class="text-sm text-gray-600">${pelanggaran.jenis_pelanggaran.deskripsi}</p>
+                            ${pelanggaran.deskripsi ? `<p class="text-xs text-gray-500 mt-1">${pelanggaran.deskripsi}</p>` : ''}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">-${pelanggaran.jenis_pelanggaran.pengurangan_point}</td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm">${pelanggaran.jenis_pelanggaran.sanksi_fisik || '-'}</p>
+                        ${pelanggaran.sanksi_fisik_diberikan ? `<p class="text-xs text-gray-500 mt-1">Diberikan: ${pelanggaran.sanksi_fisik_diberikan}</p>` : ''}
+                    </td>
+                `;
+                pelanggaranTableBody.appendChild(row);
+            });
+        }
+
+        // Load kategori pelanggaran
+        async function loadKategoriView() {
+            if (!kategoriPelanggaranElement) return;
+            
+            const kategori = await loadKategoriPelanggaran();
+            
+            kategoriPelanggaranElement.innerHTML = '';
+            
+            if (kategori.length === 0) {
+                kategoriPelanggaranElement.innerHTML = '<p class="text-center text-gray-500 py-4">Tidak ada data kategori</p>';
+                return;
+            }
+            
+            kategori.forEach(kat => {
+                const jenisInKategori = jenisPelanggaranData.filter(j => j.kategori_id === kat.id);
+                
+                const kategoriElement = document.createElement('div');
+                kategoriElement.className = 'bg-gray-50 rounded-lg p-4';
+                kategoriElement.innerHTML = `
+                    <h4 class="font-semibold text-gray-800 mb-3">${kat.bab}. ${kat.nama_bab}</h4>
+                    <div class="space-y-2 max-h-60 overflow-y-auto">
+                        ${jenisInKategori.map(j => `
+                            <div class="bg-white rounded p-3 border border-gray-200">
+                                <div class="flex justify-between items-start">
+                                    <span class="font-medium text-sm">${j.kode}</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">-${j.pengurangan_point}</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">${j.deskripsi}</p>
+                                ${j.sanksi_fisik ? `<p class="text-xs text-yellow-600 mt-1">Sanksi: ${j.sanksi_fisik}</p>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                kategoriPelanggaranElement.appendChild(kategoriElement);
+            });
+        }
+
         // Dashboard Functions
         function loadDashboardData() {
             // Total Santri
@@ -1525,8 +1885,8 @@
             const totalHalaman = hafalanData.reduce((total, h) => total + (h.halaman_akhir - h.halaman_awal + 1), 0);
             totalHalamanElement.textContent = totalHalaman;
             
-            // Total Kasus
-            totalKasusElement.textContent = kasusData.length;
+            // Total Pelanggaran
+            totalPelanggaranElement.textContent = pelanggaranData.length;
             
             // Recent Activities
             loadRecentActivities();
@@ -1548,7 +1908,8 @@
                 ...absensiData.map(a => ({...a, type: 'absensi'})),
                 ...hafalanData.map(h => ({...h, type: 'hafalan'})),
                 ...kesantrianData.map(k => ({...k, type: 'kesantrian'})),
-                ...kasusData.map(k => ({...k, type: 'kasus'}))
+                ...kasusData.map(k => ({...k, type: 'kasus'})),
+                ...pelanggaranData.map(p => ({...p, type: 'pelanggaran'}))
             ].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 5);
             
             if (allActivities.length === 0) {
@@ -1587,6 +1948,11 @@
                         activityText = `${activity.profiles.nama_lengkap} memiliki kasus baru`;
                         iconClass = 'fa-exclamation-triangle text-red-500';
                         bgColor = 'bg-red-100';
+                        break;
+                    case 'pelanggaran':
+                        activityText = `${activity.profiles.nama_lengkap} melakukan pelanggaran ${activity.jenis_pelanggaran.kode}`;
+                        iconClass = 'fa-gavel text-orange-500';
+                        bgColor = 'bg-orange-100';
                         break;
                 }
                 
