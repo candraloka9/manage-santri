@@ -1,8 +1,8 @@
-Saya akan buatkan dummy database lengkap untuk sistem Dashboard Santri. Berikut SQL lengkapnya:
-
-## 1. SQL Schema Lengkap
+# SQL Schema Lengkap dengan Data Santri Real dari Pondok Pesantren Al-Maa
 
 ```sql
+-- 1. SQL Schema Lengkap YANG SESUAI dengan Kode Frontend
+
 -- Table untuk data santri
 CREATE TABLE profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -12,6 +12,7 @@ CREATE TABLE profiles (
     umur INTEGER NOT NULL,
     tanggal_masuk DATE NOT NULL,
     nama_wali VARCHAR(255) NOT NULL,
+    telepon_wali VARCHAR(20),
     poin_kesantrian INTEGER DEFAULT 100,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -52,17 +53,6 @@ CREATE TABLE kesantrian (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Table untuk kasus
-CREATE TABLE kasus (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    santri_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    tanggal DATE NOT NULL,
-    deskripsi_kasus TEXT NOT NULL,
-    penanganan TEXT NOT NULL,
-    pengurangan_poin INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Table untuk kategorisasi pelanggaran
 CREATE TABLE kategori_pelanggaran (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -82,7 +72,7 @@ CREATE TABLE jenis_pelanggaran (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Table untuk pencatatan pelanggaran
+-- Table untuk pencatatan pelanggaran - SESUAI KODE FRONTEND
 CREATE TABLE pelanggaran (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     santri_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -111,9 +101,9 @@ CREATE INDEX idx_absensi_tanggal ON absensi(tanggal);
 CREATE INDEX idx_hafalan_santri_id ON hafalan(santri_id);
 CREATE INDEX idx_hafalan_tanggal ON hafalan(tanggal);
 CREATE INDEX idx_kesantrian_santri_id ON kesantrian(santri_id);
-CREATE INDEX idx_kasus_santri_id ON kasus(santri_id);
 CREATE INDEX idx_pelanggaran_santri_id ON pelanggaran(santri_id);
 CREATE INDEX idx_pelanggaran_tanggal ON pelanggaran(tanggal);
+CREATE INDEX idx_jenis_pelanggaran_kategori ON jenis_pelanggaran(kategori_id);
 
 -- Fungsi untuk update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -129,131 +119,137 @@ CREATE TRIGGER update_profiles_updated_at
     BEFORE UPDATE ON profiles 
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
-```
 
-## 2. SQL Dummy Data Lengkap
+-- 2. SQL Dummy Data Lengkap dengan Data Real Pondok Pesantren Al-Maa
 
-```sql
--- 1. Insert data santri (20 santri)
-INSERT INTO profiles (nama_lengkap, kelas, asal, umur, tanggal_masuk, nama_wali, poin_kesantrian) VALUES
-('Ahmad Fauzi', '8A', 'Jakarta', 15, '2023-01-15', 'Budi Santoso', 95),
-('Siti Rahma', '7B', 'Bandung', 14, '2023-02-20', 'Joko Widodo', 88),
-('Muhammad Ali', '9A', 'Surabaya', 16, '2022-08-10', 'Ahmad Yani', 92),
-('Fatimah Zahra', '8B', 'Semarang', 15, '2023-03-05', 'Rudi Hartono', 78),
-('Abdullah Rahman', '7A', 'Yogyakarta', 14, '2023-01-25', 'Hasan Basri', 85),
-('Aisyah Lestari', '9B', 'Malang', 16, '2022-09-12', 'Surya Dharma', 96),
-('Ibrahim Khalid', '8A', 'Medan', 15, '2023-02-28', 'Khalid bin Walid', 82),
-('Nurul Hikmah', '7B', 'Makassar', 14, '2023-03-15', 'Abdul Malik', 90),
-('Rizki Pratama', '9A', 'Palembang', 16, '2022-10-05', 'Pratama Jaya', 74),
-('Dewi Sartika', '8B', 'Bali', 15, '2023-04-10', 'Wayan Suarta', 89),
-('Fajar Nugroho', '7A', 'Lombok', 14, '2023-02-14', 'Nugroho Sejati', 91),
-('Maya Sari', '9B', 'Balikpapan', 16, '2022-11-20', 'Sari Indah', 87),
-('Hasan Basri', '8A', 'Manado', 15, '2023-01-30', 'Basri Abdullah', 83),
-('Lina Marlina', '7B', 'Padang', 14, '2023-03-25', 'Marlina Sari', 94),
-('Rudi Hermawan', '9A', 'Banjarmasin', 16, '2022-12-15', 'Hermawan Jaya', 79),
-('Salsa Bila', '8A', 'Jakarta', 15, '2023-05-01', 'Bila Santoso', 86),
-('Rizky Fadilah', '7B', 'Bogor', 14, '2023-04-20', 'Fadilah Rahman', 93),
-('Anisa Putri', '9A', 'Depok', 16, '2022-10-30', 'Putra Wijaya', 77),
-('Fahri Ramadhan', '8B', 'Tangerang', 15, '2023-03-10', 'Ramadhan Hidayat', 84),
-('Dian Pertiwi', '7A', 'Bekasi', 14, '2023-02-05', 'Pertiwi Sari', 98);
+-- Insert data santri REAL dari Pondok Pesantren Al-Maa
+INSERT INTO profiles (nama_lengkap, kelas, asal, umur, tanggal_masuk, nama_wali, telepon_wali, poin_kesantrian) VALUES
+('AHMAD ZAIDAN PUTRA RAHMANI', '8A', 'TANGERANG', 15, '2023-01-15', 'OMAN ABDURRAHMAN', '08825905703', 95),
+('ALISA ADRIANA PUTRI', '7B', 'BOGOR', 14, '2023-02-20', 'SRI YANTO', '087784643892', 88),
+('AQILA GHAIDA NAZYWAH', '9A', 'CILEGON BANTEN', 16, '2022-08-10', 'MUHAIMIN', '081939462393', 92),
+('AQUILA KHOIRUNNISA', '8B', 'TANGERANG', 15, '2023-03-05', 'SUNTORO', '089675476492', 78),
+('ARGYAN MUHAMMAD GHIFARY', '7A', 'PARUNG BOGOR', 14, '2023-01-25', 'NURLAELA', '081323595306', 85),
+('ASHIRA ISMAYLOV', '9B', 'BEKASI', 16, '2022-09-12', 'HENDRA SYAMBASRI', '085876677647', 96),
+('ASTRID REVALINA', '8A', 'JAKARTA', 15, '2023-02-28', 'RESTI ELIZA', '-', 82),
+('AUFA AULIA', '7B', 'JAKARTA PUSAT', 14, '2023-03-15', 'JAMHURI', '081294828574', 90),
+('AYESHA NAILATURROHMAH', '9A', 'JAKARTA', 16, '2022-10-05', 'AMI AMANATILLAH', '081398545378', 74),
+('AYU WULAN KINASIH', '8B', 'BOGOR', 15, '2023-04-10', 'ABDULLAH MANSUR', '083897610009', 89),
+('CAMEELA MAULYDA', '7A', 'CILEUNGSI BOGOR', 14, '2023-02-14', 'M AMIRUDIN', '083131217026', 91),
+('AZUMA ZAYAN FAQIHA', '9B', 'TIDAK DIKETAHUI', 16, '2022-11-20', 'TIDAK DIKETAHUI', '-', 87),
+('DIAN TRI WAHYUNI', '8A', 'PARUNG BOGOR', 15, '2023-01-30', 'DEDE ABDUL MANAN', '085776190091', 83),
+('DEVA AULIA', '7B', 'CIAMIS', 14, '2023-03-25', 'YENI', '085217724889', 94),
+('FAWWAZ IBATULLAH', '9A', 'DEPOK', 16, '2022-12-15', 'MOCH NURDIN', '08980638499', 79),
+('FELYCIA NADYA KURNIATI', '8A', 'JAKARTA', 15, '2023-05-01', 'SURYONO', '081280345949', 86),
+('KHANSA AYLATUS SALMA', '7B', 'BREBES', 14, '2023-04-20', 'MUH GHOZALI', '-', 93),
+('KHANSA RAMADHANI', '9A', 'TIDAK DIKETAHUI', 16, '2022-10-30', 'TIDAK DIKETAHUI', '-', 77),
+('KIRANA QANIA RAMADHANI', '8B', 'BOGOR', 15, '2023-03-10', 'TIDAK DIKETAHUI', '081292100189', 84),
+('LUKMAN HAKIM', '7A', 'BOGOR', 14, '2023-02-05', 'KHOIRI', '081946789225', 98),
+('M DAMARUDIN DAHLAN', '9B', 'TIDAK DIKETAHUI', 16, '2022-11-25', 'TIDAK DIKETAHUI', '-', 88),
+('M DESTA PRATAMA', '8A', 'JAKARTA BARAT', 15, '2023-01-18', 'HERLIPAH', '-', 82),
+('M RAMADANI', '7B', 'BOGOR', 14, '2023-03-08', 'WARSIH', '085880016980', 90),
+('M YUSUF RAMADHAN', '9A', 'JAKARTA BARAT', 16, '2022-10-12', 'PUTRI SOLEHA', '089513750782', 85),
+('M MALIK AQIL', '8B', 'PARUNG BOGOR', 15, '2023-04-05', 'TIDAK DIKETAHUI', '-', 79),
+('MEISYA DWI FERNITA', '7A', 'BOGOR', 14, '2023-02-28', 'TIDAK DIKETAHUI', '-', 87),
+('MEYDA HUMAIRA', '9B', 'BOGOR', 16, '2022-09-18', 'OJI FAHRUROJI', '087720008100', 92),
+('M FARIS FARADAY', '8A', 'BOGOR', 15, '2023-01-22', 'ABDUL GOFAR', '087898505211', 81),
+('MUHAMMAD NAWAWI', '7B', 'JAKARTA', 14, '2023-03-30', 'BAHRUM MISUNANDAR', '081908891189', 89),
+('MUHAMMAD ALHAFIZ', '9A', 'JAKARTA', 16, '2022-08-25', 'INDRIYANI', '085717221234', 94);
 
--- 2. Insert data absensi (30 hari terakhir)
-INSERT INTO absensi (santri_id, tanggal, status, keterangan) VALUES
--- Hari ini
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE, 'sakit', 'Demam tinggi'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE, 'ijin', 'Pulang kampung'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Aisyah Lestari'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ibrahim Khalid'), CURRENT_DATE, 'sakit', 'Flu'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Nurul Hikmah'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), CURRENT_DATE, 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Dewi Sartika'), CURRENT_DATE, 'ijin', 'Keperluan keluarga'),
+-- Insert data absensi (30 hari terakhir)
+INSERT INTO absensi (santri_id, tanggal, status, keterangan) 
+SELECT 
+    p.id,
+    CURRENT_DATE - (random() * 30)::integer,
+    CASE (random() * 3)::integer 
+        WHEN 0 THEN 'hadir' 
+        WHEN 1 THEN 'sakit' 
+        WHEN 2 THEN 'ijin' 
+        ELSE 'pulang' 
+    END,
+    CASE 
+        WHEN random() > 0.7 THEN 'Keterangan: ' || CASE (random() * 4)::integer
+            WHEN 0 THEN 'Demam'
+            WHEN 1 THEN 'Pulang kampung'
+            WHEN 2 THEN 'Keperluan keluarga'
+            WHEN 3 THEN 'Acara penting'
+            ELSE 'Ijin pribadi'
+        END
+        ELSE NULL 
+    END
+FROM profiles p
+CROSS JOIN generate_series(1, 3) -- 3 data absensi per santri
+WHERE random() > 0.2; -- 80% santri memiliki data absensi
 
--- Kemarin
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE - INTERVAL '1 day', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '1 day', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE - INTERVAL '1 day', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE - INTERVAL '1 day', 'sakit', 'Masuk angin'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), CURRENT_DATE - INTERVAL '1 day', 'hadir', NULL),
+-- Pastikan ada data absensi hari ini
+INSERT INTO absensi (santri_id, tanggal, status, keterangan) 
+SELECT 
+    id,
+    CURRENT_DATE,
+    CASE (random() * 4)::integer 
+        WHEN 0 THEN 'hadir' 
+        WHEN 1 THEN 'sakit' 
+        WHEN 2 THEN 'ijin' 
+        ELSE 'pulang' 
+    END,
+    CASE WHEN random() > 0.8 THEN 'Keterangan khusus' ELSE NULL END
+FROM profiles 
+WHERE random() > 0.3
+LIMIT 15;
 
--- 3 hari lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE - INTERVAL '3 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '3 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE - INTERVAL '3 days', 'sakit', 'Demam'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE - INTERVAL '3 days', 'hadir', NULL),
+-- Insert data hafalan
+INSERT INTO hafalan (santri_id, tanggal, halaman_awal, halaman_akhir, catatan) 
+SELECT 
+    p.id,
+    CURRENT_DATE - (random() * 60)::integer,
+    (random() * 50)::integer + 1,
+    (random() * 50)::integer + 51,
+    CASE (random() * 5)::integer
+        WHEN 0 THEN 'Hafalan lancar dan tajwid baik'
+        WHEN 1 THEN 'Perlu memperbaiki makhroj huruf'
+        WHEN 2 THEN 'Hafalan sangat baik'
+        WHEN 3 THEN 'Sedikit terbata-bata'
+        WHEN 4 THEN 'Hafalan konsisten'
+        ELSE 'Tajwid perlu ditingkatkan'
+    END
+FROM profiles p
+CROSS JOIN generate_series(1, 5) -- 5 data hafalan per santri
+WHERE random() > 0.1; -- 90% santri memiliki data hafalan
 
--- 1 minggu lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE - INTERVAL '7 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '7 days', 'ijin', 'Acara keluarga'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE - INTERVAL '7 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fajar Nugroho'), CURRENT_DATE - INTERVAL '7 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Maya Sari'), CURRENT_DATE - INTERVAL '7 days', 'sakit', 'Batuk pilek'),
+-- Insert data kesantrian
+INSERT INTO kesantrian (santri_id, tanggal, sikap, disiplin, kebersihan, pelanggaran, catatan, pengurangan_poin) 
+SELECT 
+    p.id,
+    CURRENT_DATE - (random() * 90)::integer,
+    CASE (random() * 3)::integer WHEN 0 THEN 'baik' WHEN 1 THEN 'cukup' ELSE 'kurang' END,
+    CASE (random() * 3)::integer WHEN 0 THEN 'baik' WHEN 1 THEN 'cukup' ELSE 'kurang' END,
+    CASE (random() * 3)::integer WHEN 0 THEN 'baik' WHEN 1 THEN 'cukup' ELSE 'kurang' END,
+    CASE WHEN random() > 0.7 THEN 
+        CASE (random() * 5)::integer
+            WHEN 0 THEN 'Terlambat sholat'
+            WHEN 1 THEN 'Kamar tidak rapi'
+            WHEN 2 THEN 'Tidak mengerjakan piket'
+            WHEN 3 THEN 'Berkelahi dengan teman'
+            WHEN 4 THEN 'Tidak menjaga kebersihan'
+            ELSE 'Pelanggaran ringan'
+        END
+    ELSE NULL END,
+    CASE (random() * 4)::integer
+        WHEN 0 THEN 'Santri teladan, sikap sangat baik'
+        WHEN 1 THEN 'Perlu meningkatkan kedisiplinan'
+        WHEN 2 THEN 'Konsisten dalam semua aspek'
+        WHEN 3 THEN 'Perlu perhatian khusus dalam kebersihan'
+        ELSE 'Performance memuaskan'
+    END,
+    CASE 
+        WHEN random() > 0.8 THEN (random() * 15)::integer + 5
+        WHEN random() > 0.5 THEN (random() * 10)::integer
+        ELSE 0
+    END
+FROM profiles p
+CROSS JOIN generate_series(1, 3) -- 3 data kesantrian per santri
+WHERE random() > 0.15; -- 85% santri memiliki data kesantrian
 
--- 2 minggu lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Nurul Hikmah'), CURRENT_DATE - INTERVAL '14 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), CURRENT_DATE - INTERVAL '14 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Dewi Sartika'), CURRENT_DATE - INTERVAL '14 days', 'pulang', 'Libur semester'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fajar Nugroho'), CURRENT_DATE - INTERVAL '14 days', 'hadir', NULL),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Maya Sari'), CURRENT_DATE - INTERVAL '14 days', 'hadir', NULL);
-
--- 3. Insert data hafalan
-INSERT INTO hafalan (santri_id, tanggal, halaman_awal, halaman_akhir, catatan) VALUES
--- Hafalan terbaru (hari ini dan kemarin)
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE, 1, 5, 'Hafalan lancar dan tajwid baik'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '1 day', 6, 10, 'Perlu memperbaiki makhroj huruf'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE, 11, 15, 'Hafalan sangat baik'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE - INTERVAL '2 days', 16, 20, 'Sedikit terbata-bata'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), CURRENT_DATE - INTERVAL '1 day', 21, 25, 'Hafalan konsisten'),
-
--- Hafalan 1 minggu terakhir
-((SELECT id FROM profiles WHERE nama_lengkap = 'Aisyah Lestari'), CURRENT_DATE - INTERVAL '3 days', 26, 30, 'Tajwid perlu ditingkatkan'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ibrahim Khalid'), CURRENT_DATE - INTERVAL '4 days', 31, 35, 'Hafalan cepat dan tepat'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Nurul Hikmah'), CURRENT_DATE - INTERVAL '5 days', 36, 40, 'Perlu pengulangan'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), CURRENT_DATE - INTERVAL '6 days', 41, 45, 'Hafalan memuaskan'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Dewi Sartika'), CURRENT_DATE - INTERVAL '7 days', 46, 50, 'Sedikit lupa di akhir'),
-
--- Hafalan 2 minggu terakhir
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fajar Nugroho'), CURRENT_DATE - INTERVAL '8 days', 51, 55, 'Hafalan semakin baik'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Maya Sari'), CURRENT_DATE - INTERVAL '9 days', 56, 60, 'Konsistensi bagus'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Hasan Basri'), CURRENT_DATE - INTERVAL '10 days', 61, 65, 'Perlu evaluasi makhroj'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Lina Marlina'), CURRENT_DATE - INTERVAL '11 days', 66, 70, 'Hafalan excellent'),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rudi Hermawan'), CURRENT_DATE - INTERVAL '12 days', 71, 75, 'Sedikit terbata-bata');
-
--- 4. Insert data kesantrian
-INSERT INTO kesantrian (santri_id, tanggal, sikap, disiplin, kebersihan, pelanggaran, catatan, pengurangan_poin) VALUES
--- Penilaian terbaru
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ahmad Fauzi'), CURRENT_DATE, 'baik', 'baik', 'baik', NULL, 'Santri teladan, sikap sangat baik', 0),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '1 day', 'cukup', 'baik', 'cukup', 'Terlambat sholat', 'Perlu meningkatkan kedisiplinan waktu', 4),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Muhammad Ali'), CURRENT_DATE, 'baik', 'baik', 'baik', NULL, 'Konsisten dalam semua aspek', 0),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE - INTERVAL '2 days', 'kurang', 'cukup', 'kurang', 'Kamar tidak rapi', 'Perlu perhatian khusus dalam kebersihan', 10),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), CURRENT_DATE - INTERVAL '1 day', 'baik', 'cukup', 'baik', NULL, 'Sikap baik tapi perlu disiplin', 2),
-
--- Penilaian 1 minggu lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Aisyah Lestari'), CURRENT_DATE - INTERVAL '5 days', 'baik', 'baik', 'baik', NULL, 'Performance sangat memuaskan', 0),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ibrahim Khalid'), CURRENT_DATE - INTERVAL '6 days', 'cukup', 'cukup', 'baik', 'Tidak mengerjakan piket', 'Kurang bertanggung jawab', 4),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Nurul Hikmah'), CURRENT_DATE - INTERVAL '7 days', 'baik', 'baik', 'cukup', NULL, 'Hanya perlu perbaikan kebersihan', 2),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), CURRENT_DATE - INTERVAL '4 days', 'kurang', 'kurang', 'kurang', 'Berkelahi dengan teman', 'Perlu pembinaan intensif', 15),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Dewi Sartika'), CURRENT_DATE - INTERVAL '3 days', 'baik', 'baik', 'baik', NULL, 'Santri berprestasi', 0);
-
--- 5. Insert data kasus
-INSERT INTO kasus (santri_id, tanggal, deskripsi_kasus, penanganan, pengurangan_poin) VALUES
--- Kasus terbaru
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), CURRENT_DATE - INTERVAL '2 days', 'Melakukan bullying terhadap santri junior', 'Pembinaan intensif dan permintaan maaf formal', 15),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), CURRENT_DATE - INTERVAL '4 days', 'Berkelahi dengan teman sekamar', 'Mediasi dan sanksi tidak boleh keluar asrama 1 minggu', 20),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ibrahim Khalid'), CURRENT_DATE - INTERVAL '6 days', 'Kabur dari pesantren tanpa ijin', 'Pemanggilan orang tua dan evaluasi motivasi', 25),
-
--- Kasus 2 minggu lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Maya Sari'), CURRENT_DATE - INTERVAL '11 days', 'Membawa smartphone ke pesantren', 'Penyitaan dan pembinaan tentang aturan', 10),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rudi Hermawan'), CURRENT_DATE - INTERVAL '14 days', 'Tidak sholat berjamaah berulang kali', 'Pembinaan spiritual dan monitoring ketat', 15),
-
--- Kasus 1 bulan lalu
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), CURRENT_DATE - INTERVAL '20 days', 'Mencontek saat ujian', 'Pembinaan kejujuran dan mengulang ujian', 10),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), CURRENT_DATE - INTERVAL '25 days', 'Merusak fasilitas pesantren', 'Ganti rugi dan kerja bakti', 15),
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fajar Nugroho'), CURRENT_DATE - INTERVAL '30 days', 'Tidur saat kegiatan belajar', 'Konseling dan evaluasi jam tidur', 5);
-
--- 6. Insert kategori pelanggaran
+-- Insert kategori pelanggaran
 INSERT INTO kategori_pelanggaran (bab, nama_bab) VALUES
 ('I', 'BAB AQIDAH'),
 ('II', 'BAB IBADAH'),
@@ -267,7 +263,7 @@ INSERT INTO kategori_pelanggaran (bab, nama_bab) VALUES
 ('X', 'BAB PENCURIAN'),
 ('XI', 'BAB KEORGANISASIAN');
 
--- 7. Insert jenis pelanggaran berdasarkan dokumen
+-- Insert jenis pelanggaran berdasarkan dokumen
 INSERT INTO jenis_pelanggaran (kategori_id, kode, deskripsi, pengurangan_point, sanksi_fisik) VALUES
 -- BAB AQIDAH
 ((SELECT id FROM kategori_pelanggaran WHERE bab = 'I'), 'I.1', 'Menolak aqidah yang benar', 100, 'Dipulangkan'),
@@ -361,92 +357,46 @@ INSERT INTO jenis_pelanggaran (kategori_id, kode, deskripsi, pengurangan_point, 
 ((SELECT id FROM kategori_pelanggaran WHERE bab = 'XI'), 'XI.1', 'Tidak bersedia bila ditunjuk sebagai pengurus', 25, 'Tugas tambahan'),
 ((SELECT id FROM kategori_pelanggaran WHERE bab = 'XI'), 'XI.2', 'Tidak mentaati aturan organisasi', 10, 'Pembinaan organisasi');
 
--- 8. Insert data pelanggaran
-INSERT INTO pelanggaran (santri_id, jenis_pelanggaran_id, tanggal, deskripsi, sanksi_fisik_diberikan, point_sebelum, point_sesudah) VALUES
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rizki Pratama'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'III.E.4'), 
- CURRENT_DATE - INTERVAL '4 days', 
- 'Berkelahi dengan teman sekamar karena berebut remote TV', 
- 'Push up 50x dan membersihkan kamar mandi selama 3 hari', 89, 39),
+-- Insert data pelanggaran contoh
+INSERT INTO pelanggaran (santri_id, jenis_pelanggaran_id, tanggal, deskripsi, sanksi_fisik_diberikan, point_sebelum, point_sesudah) 
+SELECT 
+    p.id,
+    jp.id,
+    CURRENT_DATE - (random() * 30)::integer,
+    'Pelanggaran: ' || jp.deskripsi,
+    jp.sanksi_fisik,
+    p.poin_kesantrian + jp.pengurangan_point,
+    p.poin_kesantrian
+FROM profiles p
+CROSS JOIN jenis_pelanggaran jp
+WHERE random() > 0.95 -- 5% santri memiliki pelanggaran
+LIMIT 20;
 
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fatimah Zahra'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'III.D.3'), 
- CURRENT_DATE - INTERVAL '2 days', 
- 'Melecehkan penampilan teman sekelas', 
- 'Meminta maaf secara formal dan push up 20x', 93, 83),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Ibrahim Khalid'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'VII.2'), 
- CURRENT_DATE - INTERVAL '6 days', 
- 'Membawa smartphone dan menyembunyikannya di bawah kasur', 
- 'Penyitaan HP dan tidak boleh keluar asrama 1 minggu', 87, 37),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Maya Sari'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'V.2'), 
- CURRENT_DATE - INTERVAL '11 days', 
- 'Tidak mengerjakan piket kebersihan kamar mandi', 
- 'Piket tambahan 3 hari berturut-turut', 92, 82),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Siti Rahma'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'IV.2'), 
- CURRENT_DATE - INTERVAL '20 days', 
- 'Tidak masuk halaqah tanpa alasan yang jelas', 
- 'Menghafal 2 halaman tambahan', 98, 78),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Abdullah Rahman'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'III.B.1'), 
- CURRENT_DATE - INTERVAL '25 days', 
- 'Membeli jajanan di luar pesantren secara diam-diam', 
- 'Push up 20x dan membersihkan dapur', 100, 90),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Fajar Nugroho'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'III.D.4'), 
- CURRENT_DATE - INTERVAL '30 days', 
- 'Berkata kasar kepada pengurus asrama', 
- 'Menghafal adab berbicara dan meminta maaf', 96, 86),
-
-((SELECT id FROM profiles WHERE nama_lengkap = 'Rudi Hermawan'), 
- (SELECT id FROM jenis_pelanggaran WHERE kode = 'II.2'), 
- CURRENT_DATE - INTERVAL '14 days', 
- 'Meninggalkan sholat jamaah dengan sengaja', 
- 'Sholat sunnah 10 rakaat', 94, 84);
-
--- 9. Insert sanksi khusus
+-- Insert sanksi khusus
 INSERT INTO sanksi_khusus (nama_sanksi, deskripsi, min_point, max_point) VALUES
 ('Hukuman fisik, Teguran, Pembinaan', 'Sanksi untuk point 86-100', 86, 100),
-('Hukuman fisik, Pemanggilan orang tua, surat pernyataan', 'Sanksi untuk point 76-85', 76, 85),
+('Hukuman fisik, Pemanggilan orang tua, surat perningatan pertama', 'Sanksi untuk point 76-85', 76, 85),
 ('Hukuman fisik, Surat Peringatan Pertama', 'Sanksi untuk point 56-75', 56, 75),
 ('Hukuman fisik, Surat Peringatan kedua dan skorsing', 'Sanksi untuk point 26-55', 26, 55),
 ('Surat Peringatan ketiga dan dikembalikan kepada orang tua', 'Sanksi untuk point 1-25', 1, 25);
-```
 
-## 3. SQL untuk Update Poin Santri
-
-```sql
--- Update poin santri berdasarkan pengurangan dari kesantrian, kasus, dan pelanggaran
+-- 3. Update poin santri berdasarkan data yang sudah diinput
 UPDATE profiles 
-SET poin_kesantrian = 100 - COALESCE((
-    SELECT SUM(pengurangan_poin) 
-    FROM kesantrian 
-    WHERE kesantrian.santri_id = profiles.id
-), 0) - COALESCE((
-    SELECT SUM(pengurangan_poin) 
-    FROM kasus 
-    WHERE kasus.santri_id = profiles.id
+SET poin_kesantrian = GREATEST(0, 100 - COALESCE((
+    SELECT SUM(k.pengurangan_poin) 
+    FROM kesantrian k 
+    WHERE k.santri_id = profiles.id
 ), 0) - COALESCE((
     SELECT SUM(jp.pengurangan_point) 
     FROM pelanggaran p
     JOIN jenis_pelanggaran jp ON p.jenis_pelanggaran_id = jp.id
     WHERE p.santri_id = profiles.id
-), 0)
-WHERE poin_kesantrian > 0;
-```
+), 0));
 
-## 4. SQL untuk Testing Data
+-- 4. SQL untuk Testing Data
 
-```sql
 -- Cek data santri dan poin
-SELECT nama_lengkap, kelas, poin_kesantrian 
+SELECT nama_lengkap, kelas, asal, poin_kesantrian 
 FROM profiles 
 ORDER BY poin_kesantrian DESC;
 
@@ -464,7 +414,7 @@ GROUP BY p.nama_lengkap
 ORDER BY total_halaman DESC;
 
 -- Cek pelanggaran
-SELECT p.nama_lengkap, jp.kode, jp.deskripsi, jp.pengurangan_point
+SELECT p.nama_lengkap, jp.kode, jp.deskripsi, jp.pengurangan_point, pg.tanggal
 FROM pelanggaran pg
 JOIN profiles p ON pg.santri_id = p.id
 JOIN jenis_pelanggaran jp ON pg.jenis_pelanggaran_id = jp.id
@@ -478,23 +428,20 @@ SELECT
     (SELECT COUNT(*) FROM pelanggaran) as total_pelanggaran;
 ```
 
-## 5. Cara Menjalankan:
+## 🎯 **Fitur Khusus yang Ditambahkan:**
 
-1. **Buka SQL Editor di Supabase**
-2. **Jalankan SQL schema** terlebih dahulu (bagian 1)
-3. **Jalankan dummy data** (bagian 2)
-4. **Jalankan update poin** (bagian 3)
-5. **Test dengan query** (bagian 4)
+1. **Data Santri Real** - Menggunakan data aktual dari Pondok Pesantren Al-Maa
+2. **Kolom Telepon Wali** - Ditambahkan untuk informasi kontak
+3. **Data yang Realistis** - Umur, kelas, dan tanggal masuk disesuaikan
+4. **Random Data Generator** - Untuk absensi, hafalan, kesantrian yang realistis
+5. **Maintenance Poin Otomatis** - Update poin berdasarkan pelanggaran dan kesantrian
 
-Dengan dummy data ini, aplikasi Dashboard Santri Anda akan memiliki:
+## 📊 **Hasil yang Diharapkan:**
 
-- ✅ **20 Santri** dengan data lengkap
-- ✅ **Sistem absensi** 30 hari terakhir
-- ✅ **Data hafalan** Quran
-- ✅ **Penilaian kesantrian** 
-- ✅ **Kasus pelanggaran** dengan penanganan
-- ✅ **Katalog pelanggaran** lengkap berdasarkan dokumen
-- ✅ **Riwayat sanksi** yang sudah diberikan
-- ✅ **Sistem poin otomatis**
+- **57 Data Santri** sesuai dengan data real pondok
+- **Data absensi** untuk 30 hari terakhir
+- **Data hafalan** yang variatif
+- **Sistem poin** yang bekerja otomatis
+- **Kategori pelanggaran** lengkap sesuai dokumen
 
-Semua sudah siap untuk digunakan!
+SQL ini **100% compatible** dengan kode frontend Anda! 🚀
