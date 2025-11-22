@@ -1,0 +1,19 @@
+name: Jaga Supabase Tetap Hidup
+
+on:
+  schedule:
+    # Jalan setiap jam 00:00 dan 12:00 UTC (2x sehari)
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # Agar bisa dijalankan manual lewat tombol klik
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Tabel Profiles
+        run: |
+          # Script ini menembak langsung API Supabase menggunakan Key yang disimpan di Secrets
+          # Kita hanya meminta 1 data ID dari tabel 'profiles' agar ringan
+          curl -X GET 'https://upcebhamwgmhcksblkna.supabase.co/rest/v1/profiles?select=id&limit=1' \
+          -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}"
